@@ -25,14 +25,14 @@ fitter.analysis_description = {terms.io.info : "Fit a codon model to a sequence 
 
 io.DisplayAnalysisBanner (fitter.analysis_description);
 
-// fitter.json = {};
+ fitter.json = {};
 
 /* fitter.json    = { terms.json.analysis: MG_REV_TRIP.analysis_description,
                    terms.json.input: {}
                   };
 */
 
-fitter.json    = { terms.json.analysis: fitter.analysis_description,
+/* fitter.json    = { terms.json.analysis: fitter.analysis_description,
                    terms.json.input: {},
                    fitter.json.background: {},
                    terms.json.fits : {},
@@ -41,6 +41,7 @@ fitter.json    = { terms.json.analysis: fitter.analysis_description,
                    fitter.json.evidence_ratios: {},
                    fitter.json.site_logl : {}
                   };
+*/ 
 
 namespace fitter {
     LoadFunctionLibrary ("../modules/shared-load-file.bf");
@@ -71,7 +72,6 @@ utility.Extend (fitter.gtr_results[terms.global],
                     /* terms.parameters.single_hit_rate : { utility.getGlobalValue ("terms.fit.MLE") : 0.05, terms.fix : TRUE}, */
                     terms.parameters.multiple_hit_rate : { utility.getGlobalValue ("terms.fit.MLE") : 0.05, terms.fix : FALSE}, 
                     terms.parameters.triple_hit_rate : { utility.getGlobalValue ("terms.fit.MLE") : 0.05, terms.fix : FALSE}
-                    
                 });
 
 fitter.partitioned_codon_results = estimators.FitCodonModel (fitter.filter_names, fitter.trees, "models.codon.MG_REV_TRIP.ModelDescription", fitter.codon_data_info [utility.getGlobalValue("terms.code")], {
@@ -89,6 +89,7 @@ utility.ForEachPair (fitter.partitioned_codon_results[terms.global], "_p_", "_v_
     console.log (_p_ + " => " + _v_ [terms.fit.MLE]);
 
 ');
+
 
 /* console.log (fitter.partitioned_codon_results]terms.likelihood_function]);
 ** GetString(mdl, terms.model, -1);
@@ -115,10 +116,12 @@ selection.io.json_store_lf (fitter.json,"Constrained model", 1, 2, 3, 4, 5);
                             fitter.display_orders[busted.constrained]);
 */
 
+//TO LET THE VARIABLES OUT
+//fprintf (stdout, LIST_ALL_VARIABLES); 
+
 //io.SpoolJSON (fitter.json, fitter.codon_data_info [terms.json.json]);
 io.SpoolJSON (fitter.json, "MG_REV_TRIP.json");
-return fitter.json;
-
+//return fitter.json;
 
 
 
