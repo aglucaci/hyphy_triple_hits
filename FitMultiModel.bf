@@ -27,13 +27,13 @@ fitter.analysis_description = {terms.io.info : "Fit a codon model to a sequence 
 
 io.DisplayAnalysisBanner (fitter.analysis_description);
 
- fitter.json = {};
-/*
+// fitter.json = {};
+
  fitter.json    = { terms.json.analysis: MG_REV_TRIP.analysis_description,
                    terms.json.input: {}
                   };
 
-
+/*
 fitter.json    = { terms.json.analysis: fitter.analysis_description,
                    terms.json.input: {},
                    fitter.json.background: {},
@@ -70,7 +70,6 @@ fitter.partitioned_one_hit_results =  estimators.FitCodonModel (fitter.filter_na
 
 utility.Extend (fitter.gtr_results[terms.global],
                 {
-                    /* terms.parameters.single_hit_rate : { utility.getGlobalValue ("terms.fit.MLE") : 0.05, terms.fix : TRUE}, */
                     terms.parameters.multiple_hit_rate : { utility.getGlobalValue ("terms.fit.MLE") : 0.05, terms.fix : FALSE},
                     terms.parameters.triple_hit_rate : { utility.getGlobalValue ("terms.fit.MLE") : 0.05, terms.fix : FALSE}
 
@@ -91,7 +90,7 @@ fitter.partitioned_codon_results = estimators.FitCodonModel (fitter.filter_names
 
 io.ReportProgressMessageMD("fitter", "codon-fit", "* " + selection.io.report_fit (fitter.partitioned_codon_results, 0, (^"fitter.codon_data_info")[utility.getGlobalValue ("terms.data.sample_size")]));
 
-console.log ("Single Hit Results: \n");
+console.log ("\n Single Hit Results: \n");
 
 utility.ForEachPair (fitter.partitioned_one_hit_results[terms.global], "_p_", "_v_",
 '
@@ -112,7 +111,7 @@ console.log ("\n Triple Hit Results: \n");
 utility.ForEachPair (fitter.partitioned_codon_results[terms.global], "_p_", "_v_",
 '
     console.log (_p_ + " => " + _v_ [terms.fit.MLE]);
-
+    
 ');
 
 
@@ -124,20 +123,28 @@ utility.ForEachPair (fitter.partitioned_codon_results[terms.global], "_p_", "_v_
 // ^ dereferences the name supplied by the namespace.model[terms.likelihood_function]));
 
 
+fitter.triple_hit_distribution = {terms.parameters.omega_ratio : 4,
+			       	  terms.parameter.multiple_hit_rate : 5,
+			       	  terms.parameters.triple_hit_rate: 0			       
+			       			       	 };
+
+
+fprintf(stdout, fitter.triple_hit_distribution);
+
+
+
 /* json output is the likelihood function for each model. */
 
-//selection.io.json_store_lf (fitter.json,"Constrained model", 1, 2, 3, 4, 5);
-/*
+
 
  selection.io.json_store_lf (fitter.json,
 			    "Triple hit model",
                             fitter.partitioned_codon_results[terms.likelihood_function],
                             fitter.partitioned_codon_results[terms.parameters] + 9, // +9 comes from CF3x4
                             fitter.sample_size,
-                            utility.ArrayToDict (utility.Map (rate_distribution, "_value_", "{'key': _value_[terms.description], 'value' : Eval({{_value_ [terms.fit.MLE],1}})}")),
-                            (fitter.partitioned_codon_results[terms.efv_estimate])["VALUEINDEXORDER"][0],
+                            fitter.triple_hit_distribution,
                             1);
-*/
+
 //io.SpoolJSON (fitter.json, fitter.codon_data_info [terms.json.json]);
 io.SpoolJSON (fitter.json, "MG_REV_TRIP.json");
 return fitter.json;
