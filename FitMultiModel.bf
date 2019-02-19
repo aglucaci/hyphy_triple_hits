@@ -28,23 +28,6 @@ fitter.analysis_description = {terms.io.info : "Fit a codon model to a sequence 
 io.DisplayAnalysisBanner (fitter.analysis_description);
 
 fitter.json = {};
-/*
- fitter.json    = { terms.json.analysis: MG_REV_TRIP.analysis_description,
-                   terms.json.input: {}
-                  };
-
-
-fitter.json    = { terms.json.analysis: fitter.analysis_description,
-                   terms.json.input: {},
-                   fitter.json.background: {},
-                   terms.json.fits : {},
-                   terms.json.timers : {},
-                   fitter.json.site_logl : {},
-                   fitter.json.evidence_ratios: {},
-                   fitter.json.site_logl : {}
-                  };
-
-*/
 
 namespace fitter {
     LoadFunctionLibrary ("modules/shared-load-file.bf");
@@ -122,19 +105,39 @@ utility.ForEachPair (fitter.partitioned_codon_results[terms.global], "_p_", "_v_
 
 // ^ dereferences the name supplied by the namespace.model[terms.likelihood_function]));
 
-
-fitter.triple_hit_distribution = {terms.parameters.omega_ratio : fitter.partitioned_codon_results[terms.parameters.omega_ratio[terms.fit.MLE]],
-			       	  terms.parameters.multiple_hit_rate : 5,
-			       	  terms.parameters.triple_hit_rate: 10
+fitter.triple_hit_distribution = {terms.parameters.omega_ratio : ((fitter.partitioned_codon_results[terms.global])[terms.parameters.omega_ratio])[terms.fit.MLE],
+			       	  terms.parameters.multiple_hit_rate : ((fitter.partitioned_codon_results[terms.global])[terms.parameters.multiple_hit_rate])[terms.fit.MLE],
+			       	  terms.parameters.triple_hit_rate: ((fitter.partitioned_codon_results[terms.global])[terms.parameters.triple_hit_rate])[terms.fit.MLE]
 			       			       	 };
 
+fitter.one_hit_distribution = {terms.parameters.omega_ratio : ((fitter.partitioned_one_hit_results[terms.global])[terms.parameters.omega_ratio])[terms.fit.MLE],
+			       	  terms.parameters.multiple_hit_rate : ((fitter.partitioned_one_hit_results[terms.global])[terms.parameters.multiple_hit_rate])[terms.fit.MLE],
+			       	  terms.parameters.triple_hit_rate: ((fitter.partitioned_one_hit_results[terms.global])[terms.parameters.triple_hit_rate])[terms.fit.MLE]
+			       			       	 };
 
-fprintf(stdout, fitter.triple_hit_distribution);
-
+fitter.two_hit_distribution = {terms.parameters.omega_ratio : ((fitter.partitioned_two_hit_results[terms.global])[terms.parameters.omega_ratio])[terms.fit.MLE],
+			       	  terms.parameters.multiple_hit_rate : ((fitter.partitioned_two_hit_results[terms.global])[terms.parameters.multiple_hit_rate])[terms.fit.MLE],
+			       	  terms.parameters.triple_hit_rate: ((fitter.partitioned_two_hit_results[terms.global])[terms.parameters.triple_hit_rate])[terms.fit.MLE]
+			       			       	 };
 
 
 /* json output is the likelihood function for each model. */
 
+selection.io.json_store_lf (fitter.json,
+                          "Single hit model",
+                           fitter.partitioned_one_hit_results[terms.fit.log_likelihood],
+                           fitter.partitioned_one_hit_results[terms.parameters] + 9, // +9 comes from CF3x4
+                           fitter.sample_size,
+                           fitter.one_hit_distribution,
+                           1);
+
+selection.io.json_store_lf (fitter.json,
+                         "Double hit model",
+                          fitter.partitioned_two_hit_results[terms.fit.log_likelihood],
+                          fitter.partitioned_two_hit_results[terms.parameters] + 9, // +9 comes from CF3x4
+                          fitter.sample_size,
+                          fitter.two_hit_distribution,
+                          2);
 
 
  selection.io.json_store_lf (fitter.json,
@@ -143,7 +146,7 @@ fprintf(stdout, fitter.triple_hit_distribution);
                             fitter.partitioned_codon_results[terms.parameters] + 9, // +9 comes from CF3x4
                             fitter.sample_size,
                             fitter.triple_hit_distribution,
-                            1);
+                            3);
 
 //io.SpoolJSON (fitter.json, fitter.codon_data_info [terms.json.json]);
 io.SpoolJSON (fitter.json, "MG_REV_TRIP_test.json");
