@@ -8,9 +8,10 @@ Created on Fri Feb 22 11:49:59 2019
 import json, csv
 import os
 
-this_row = []
+#this_row = []
 
 def read_json(filename):
+    this_row = []
     with open(filename, "r") as fh:
         json_data = json.load(fh)
         
@@ -62,13 +63,16 @@ def read_json(filename):
         this_row.append(json_data["fits"]["Standard MG94"]["Rate Distributions"]["non-synonymous/synonymous rate ratio"])
    
     fh.close()
+    
     writeto_csv(filename, this_row)
     
 #CSV
 def writeto_csv(filename, this_row):
-    global columns
-    csv_writer = csv.writer(open(filename+".csv", "w"), delimiter=",")
-    csv_writer.writerow(columns)
+    global columns, wrote_columns
+    csv_writer = csv.writer(open("output_withcol.csv", "a+"), delimiter=",")
+    if wrote_columns == False:
+        csv_writer.writerow(columns)
+        wrote_columns = True
     csv_writer.writerow(this_row)
 # =============================================================================
 # Main subroutine
@@ -89,8 +93,11 @@ columns += ["Substitution rate from nucleotide A to nucleotide C", "Substitution
 columns += ["non-synonymous/synonymous rate ratio"]
 
 
-path = os.getcwd()
+#path = os.getcwd()
+path="/Users/phylo/Downloads/selectome_trip_ammended_analysis"
 files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith(".json")]
+
+wrote_columns = False
 
 for file in files:
     #print(file)
