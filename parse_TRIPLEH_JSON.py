@@ -62,6 +62,10 @@ def read_json(filename):
         this_row.append(json_data["fits"]["Standard MG94"]["Rate Distributions"]["Substitution rate from nucleotide G to nucleotide T"])
         this_row.append(json_data["fits"]["Standard MG94"]["Rate Distributions"]["non-synonymous/synonymous rate ratio"])
    
+        #GENES WITH TRIPLE HIT RATES ABOVE 1
+    
+    
+    
     fh.close()
     
     writeto_csv(filename, this_row)
@@ -74,6 +78,7 @@ def writeto_csv(filename, this_row):
         csv_writer.writerow(columns)
         wrote_columns = True
     csv_writer.writerow(this_row)
+    
 # =============================================================================
 # Main subroutine
 # =============================================================================
@@ -102,8 +107,6 @@ wrote_columns = False
 for file in files:
     #print(file)
     read_json(file)
-    
-    
     
 # =============================================================================
 # END OF FILE
