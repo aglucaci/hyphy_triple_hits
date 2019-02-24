@@ -193,8 +193,8 @@ with open(fname) as f:
 #subplot_histogram(TestResults_pvalues, ["","",""], ["Double-hit vs single-hit - p-value","Triple-hit vs double-hit - p-value","Triple-hit vs single-hit - p-value"], "Models comparison - Fits, TestResults_pvalues", "TestResults_pvalues", "TestResults_pvalues")
 #subplot_binnedHisto(TestResults_pvalues, ["","",""], ["Double-hit vs single-hit - p-value","Triple-hit vs double-hit - p-value","Triple-hit vs single-hit - p-value"], "Models comparison - Fits, TestResults_pvalues", "TestResults_pvalues", "TestResults_pvalues")
 
-subplot_boxplot(LRTs, ["","",""], ["Double-hit vs single-hit","Triple-hit vs double-hit","Triple-hit vs single-hit"], "Models comparison - LRT values", "LRTs", "LRTs")
-subplot_boxplot(sig_LRTs, ["","",""], ["Double-hit vs single-hit","Triple-hit vs double-hit","Triple-hit vs single-hit"], "Models comparison - Significant (p<0.05) LRT values", "Significant LRTs", "sigLRTs")
+#subplot_boxplot(LRTs, ["","",""], ["Double-hit vs single-hit","Triple-hit vs double-hit","Triple-hit vs single-hit"], "Models comparison - LRT values", "LRTs", "LRTs")
+#subplot_boxplot(sig_LRTs, ["","",""], ["Double-hit vs single-hit","Triple-hit vs double-hit","Triple-hit vs single-hit"], "Models comparison - Significant (p<0.05) LRT values", "Significant LRTs", "sigLRTs")
 
 # =============================================================================
 # Summary Statistics
