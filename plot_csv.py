@@ -31,6 +31,13 @@ n = 13292
 AICc = [[], [], []]
 LL = [[], [], []]
 
+omegas = [[], [], []]
+
+TestResults_pvalues = [[], [], []]
+LRTs = [[], [], []]
+
+sig_LRTs = [[], [], []]
+sig_LRTs_counts = [0, 0, 0]
 # =============================================================================
 # Helper functions
 # =============================================================================
@@ -60,6 +67,16 @@ def subplot_boxplot(asizes, adesc, species, title, xaxislabel, filename):
     #fig["layout"]["legend"].update(yanchor="top")
 
     plotly.offline.plot(fig, filename=filename+"_SUBPLOT_Boxplot.html")
+
+def subplot_binnedHisto(asizes, adesc, species, title, xaxislabel, filename):
+    plotly.offline.init_notebook_mode(connected=False)
+    trace0 = go.Histogram(x=asizes[0], text=adesc[0], name=species[0], ybins=dict(size=0.01))
+    trace1 = go.Histogram(x=asizes[1], text=adesc[1], name=species[1], ybins=dict(size=0.01))
+    trace2 = go.Histogram(x=asizes[2], text=adesc[2], name=species[2], ybins=dict(size=0.01))
+    
+    fig = go.Figure(data=[trace0, trace1, trace2])
+    fig["layout"].update(title=title)
+    plotly.offline.plot(fig, filename=filename+"_SUBPLOT_BinnedHistogram.html")
 
 def subplot_histogram(asizes, adesc, species, title, xaxislabel, filename):
     #global asizes, afilename, adesc
@@ -129,15 +146,39 @@ with open(fname) as f:
         LL[1].append(float(data[21])) #MG94 with double instantaneous substitutions - Log Likelihood
         LL[2].append(float(data[31])) #Standard MG94 - Log Likelihood
         
+        #LRTs
+        LRTs[0].append(float(data[3])) #Double-hit vs single-hit
+        LRTs[1].append(float(data[5])) #Triple-hit vs double-hit
+        LRTs[2].append(float(data[7])) #Triple-hit vs single-hit 
+        
         #Significant LRTs
-
+        if float(data[4]) < 0.05:
+            sig_LRTs[0].append(float(data[3])) #Double-hit vs single-hit
+        if float(data[6]) < 0.05:
+            sig_LRTs[1].append(float(data[5])) #Triple-hit vs double-hit
+        if float(data[8]) < 0.05:
+            sig_LRTs[2].append(float(data[7])) #Triple-hit vs single-hit 
+            
+        
+        
+        #Omegas
+        omegas[0].append(float(data[17])) #MG94 with double and triple instantaneous substitutions
+        omegas[1].append(float(data[28])) #MG94 with double instantaneous substitutions
+        omegas[2].append(float(data[38])) #Standard MG94
+        
+        #Test Results (p-values)
+        TestResults_pvalues[0].append(float(data[4])) #Double-hit vs single-hit - p-value
+        TestResults_pvalues[1].append(float(data[6])) #Triple-hit vs double-hit - p-value
+        TestResults_pvalues[2].append(float(data[8])) #Triple-hit vs single-hit - p-value
+        
+        
         count += 1
         
 # =============================================================================
 # Make plots here.
 # =============================================================================       
 #plotly_things(TripleH_rates, "TH_RATES", "rate at which 3 nucleotides are changed instantly within a single codon", "Triple Mutation hit rate histogram", "Rate value")
-#plotly_things(num_seqs, "NUMSEQS", "Sequence size distribution", "Number of seqeuences analyzed", "Number of sequences per file analyzed")
+#plotly_things(num_seqs, "NUMSEQS", "Number of sequences", "Number of sequences analyzed per gene family", "Number of sequences analyzed per gene family")
 #plotly_things(num_sites, "NUMSITES", "Number of sites (Alignment length)", "Number of sites analyzed", "Number of sites aligned")
 
 #subplot_histogram(AICc, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - AICc", "AICc", "AICc")
@@ -147,6 +188,13 @@ with open(fname) as f:
 #plotly_boxplot(num_sites, "NUMSITES", "Number of sites (Alignment length)", "Number of sites analyzed", "Number of sites aligned")     
 #subplot_boxplot(AICc, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - AICc", "AICc", "AICc")
 
+#subplot_boxplot(omegas, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - Omega values", "Omega", "Omega")
+
+#subplot_histogram(TestResults_pvalues, ["","",""], ["Double-hit vs single-hit - p-value","Triple-hit vs double-hit - p-value","Triple-hit vs single-hit - p-value"], "Models comparison - Fits, TestResults_pvalues", "TestResults_pvalues", "TestResults_pvalues")
+#subplot_binnedHisto(TestResults_pvalues, ["","",""], ["Double-hit vs single-hit - p-value","Triple-hit vs double-hit - p-value","Triple-hit vs single-hit - p-value"], "Models comparison - Fits, TestResults_pvalues", "TestResults_pvalues", "TestResults_pvalues")
+
+subplot_boxplot(LRTs, ["","",""], ["Double-hit vs single-hit","Triple-hit vs double-hit","Triple-hit vs single-hit"], "Models comparison - LRT values", "LRTs", "LRTs")
+subplot_boxplot(sig_LRTs, ["","",""], ["Double-hit vs single-hit","Triple-hit vs double-hit","Triple-hit vs single-hit"], "Models comparison - Significant (p<0.05) LRT values", "Significant LRTs", "sigLRTs")
 
 # =============================================================================
 # Summary Statistics
@@ -158,19 +206,18 @@ print(stats.describe(TripleH_rates))
 print()
 #print(sorted(TripleH_rates))
 
-print("Number of files containing genes with triple hit rate > 1.0:", len(Genename_TripleH)) #NOW HAVE TO GO INTO EACH FILE AND PICK THE GENE NAMES WITH rates above 1 <- do in CSV creator.
+print("Number of files with triple hit rate > 1.0:", len(Genename_TripleH)) #NOW HAVE TO GO INTO EACH FILE AND PICK THE GENE NAMES WITH rates above 1 <- do in CSV creator.
+print()
 
 #For what proportion of these rates was there a significant p-value for non-zero triple hits?
 #if "rate at which 3 nucleotides are changed instantly within a single codon" > 0.0 then
 #if "Triple-hit vs double-hit" or Triple-hit vs single-hit", p value < 0.05, count it and indicate which
-
 print(significant_TripleH, n, "\n", "Signicicant Proportion Triple-hit vs double-hit (%):", (significant_TripleH[0]/n)*100, "\n", "Significant Proprotion Triple-hit vs single-hit (%):", (significant_TripleH[1]/n)*100)
 print()
 print("Average number of sequences:", sum(num_seqs)/ len(num_seqs))
 print(stats.describe(np.asarray(num_seqs)))
 print("Average number of sites:", sum(num_sites)/ len(num_sites))
 print(stats.describe(np.asarray(num_sites)))
-
 
 #print("AICc averages:", np.average(np_AICc[0]))
 #print(np.average(np_AICc[1]))
@@ -190,19 +237,25 @@ print("#MG94 with double and triple instantaneous substitutions#\n", stats.descr
 print("#MG94 with double instantaneous substitutions#\n", stats.describe(np_LL[1]))
 print("#Standard MG94#\n", stats.describe(np_LL[2]))
 
+      
+      
+     
+      
 # =============================================================================
 # End of file
 # =============================================================================
-#To Do AICc histo between the 3 models. (Make 3 histos)
-#To Do log(L) histo between the 3 models. (Make 3 histos)
+#To Do AICc histo between the 3 models. (Make 3 histos) (done)
+#To Do log(L) histo between the 3 models. (Make 3 histos) (done)
 #Significant (p < 0.05) LRT comparison between models. (3 histos).. meaning LRT Values which are significant
-#number of sites histo
+#number of sites histo (done)
 
 
 """
-#pvalues comparison between models (histos)
-#Omega value boxplots betwee nmodels.
+#pvalues comparison between models (histos)  (done)
+
+#Omega value boxplots between models. (done)
+
 #LRT, p value comparison. Which model is better? Highest LRT with p < 0.05
-#as above but for AICc
-#Triple hit rate histo.
+
+#Triple hit rate histo. (done)
 """
