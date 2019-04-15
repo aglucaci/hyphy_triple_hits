@@ -99,11 +99,7 @@ def writeto_csv(filename, this_row):
         csv_writer.writerow(columns)
         wrote_columns = True
     csv_writer.writerow(this_row)
-<<<<<<< HEAD
 
-=======
-
->>>>>>> 93bf070e3e2d9faafd15c982ec04486ca906aa17
 # =============================================================================
 # Main subroutine
 # =============================================================================
@@ -111,25 +107,23 @@ columns = ["File name", "number of sequences", "number of sites", "Double-hit vs
 columns += ["MG94 with double and triple instantaneous substitutions - AIC-c", "MG94 with double and triple instantaneous substitutions - Log Likelihood"]
 columns += ["Substitution rate from nucleotide A to nucleotide C", "Substitution rate from nucleotide A to nucleotide G", "Substitution rate from nucleotide A to nucleotide T","Substitution rate from nucleotide C to nucleotide G","Substitution rate from nucleotide C to nucleotide T","Substitution rate from nucleotide G to nucleotide T"]
 columns += ["non-synonymous/synonymous rate ratio", "rate at which 2 nucleotides are changed instantly within a single codon","rate at which 3 nucleotides are changed instantly within a single codon"]
-<<<<<<< HEAD
+
 columns += ["GDD rate category 1.triple", "GDD rate category 2.triple", "GDD rate category 3.triple","Mixture auxiliary weight for GDD category 1.triple", "Mixture auxiliary weight for GDD category 2.triple"]
 columns += ["distribution.triple"]
-=======
->>>>>>> 93bf070e3e2d9faafd15c982ec04486ca906aa17
+
 
 columns += ["MG94 with double instantaneous substitutions - AIC-c", "MG94 with double instantaneous substitutions - Log Likelihood"]
 columns += ["Substitution rate from nucleotide A to nucleotide C", "Substitution rate from nucleotide A to nucleotide G", "Substitution rate from nucleotide A to nucleotide T","Substitution rate from nucleotide C to nucleotide G","Substitution rate from nucleotide C to nucleotide T","Substitution rate from nucleotide G to nucleotide T"]
 columns += ["non-synonymous/synonymous rate ratio", "rate at which 2 nucleotides are changed instantly within a single codon"]
-<<<<<<< HEAD
+
 columns += ["GDD rate category 1.double", "GDD rate category 2.double", "GDD rate category 3.double","Mixture auxiliary weight for GDD category 1.double", "Mixture auxiliary weight for GDD category 2.double"]
 columns += ["distribution.double"]
-=======
->>>>>>> 93bf070e3e2d9faafd15c982ec04486ca906aa17
+
 
 columns += ["Standard MG94 - AIC-c", "Standard MG94 - Log Likelihood"]
 columns += ["Substitution rate from nucleotide A to nucleotide C", "Substitution rate from nucleotide A to nucleotide G", "Substitution rate from nucleotide A to nucleotide T","Substitution rate from nucleotide C to nucleotide G","Substitution rate from nucleotide C to nucleotide T","Substitution rate from nucleotide G to nucleotide T"]
 columns += ["non-synonymous/synonymous rate ratio"]
-<<<<<<< HEAD
+
 columns += ["GDD rate category 1.single", "GDD rate category 2.single", "GDD rate category 3.single","Mixture auxiliary weight for GDD category 1.single", "Mixture auxiliary weight for GDD category 2.single"]
 columns += ["distribution.single"]
 
@@ -137,29 +131,14 @@ columns += ["distribution.single"]
 #path = os.getcwd()
 path="/home/swisotsky/data/selectome_4_11_19/data/"
 files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith("FITTER.json")]
-=======
 
-
-#path = os.getcwd()
-path="/Users/phylo/Downloads/selectome_trip_ammended_analysis"
-files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith(".json")]
->>>>>>> 93bf070e3e2d9faafd15c982ec04486ca906aa17
 
 wrote_columns = False
 
 for file in files:
-<<<<<<< HEAD
-    print(file)
-    read_json(file)
-
-# =============================================================================
-# END OF FILE
-# =============================================================================
-=======
     #print(file)
     read_json(file)
 
 # =============================================================================
 # END OF FILE
 # =============================================================================
->>>>>>> 93bf070e3e2d9faafd15c982ec04486ca906aa17
