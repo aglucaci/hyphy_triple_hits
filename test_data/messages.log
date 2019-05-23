@@ -1,0 +1,9 @@
+
+Variable '_HY_NUC_ALIGN_HAVE_SCORE_MATRIX' was not initialized prior to being used
+Variable 'scoreMatrix' was not initialized prior to being used
+Loaded 'SeqAlignmentNucShared' from '/Users/Sadie/bin/hyphy/res/TemplateBatchFiles/SeqAlignmentNucShared.ibf'
+Row and/or column partition is empty. All the data will be used by default.
+Loaded 'Utility/NJ.bf' from '/Users/Sadie/bin/hyphy/res/TemplateBatchFiles/Utility/NJ.bf'
+Loaded 'Utility/GrabBag.bf' from '/Users/Sadie/bin/hyphy/res/TemplateBatchFiles/Utility/GrabBag.bf'
+Variable 'doCodonAlignment' was not initialized prior to being used
+Variable 'myStartingPosition' was not initialized prior to being used
