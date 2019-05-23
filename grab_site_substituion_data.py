@@ -91,8 +91,9 @@ def read_json(filename):
                             codon_change[from_codon][to_codon] += len(this_row[0][k][from_codon][to_codon])
 
 
-path = "/Users/user/Documents/Pond Lab/Triple hits/Analysis/selectome_trip_ammended_analysis"
+#path = "/Users/user/Documents/Pond Lab/Triple hits/Analysis/selectome_trip_ammended_analysis"
 
+path = "/Users/Sadie/Downloads/trip_hit_data_4_26"
 files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith(".json")]
 
 
