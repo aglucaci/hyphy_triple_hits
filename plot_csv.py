@@ -10,7 +10,7 @@ https://plot.ly/python/scientific-charts/
 # =============================================================================
 # Imports
 # =============================================================================
-import plotly
+import plotly, sys
 import plotly.graph_objs as go
 from plotly import tools
 import numpy as np 
@@ -29,6 +29,7 @@ columns = ['File name', 'number of sequences', 'number of sites', 'Double-hit vs
 #n = 500 #has to be a way to calc this
 
 AICc = [[], [], []]
+diff_AICc = [[], [], []]
 LL = [[], [], []]
 
 omegas = [[], [], []]
@@ -104,9 +105,10 @@ def subplot_histogram_morebins(asizes, adesc, species, title, xaxislabel, filena
     #global asizes, afilename, adesc
     plotly.offline.init_notebook_mode(connected=False)
     #trace3 = go.Histogram(x=asizes[3], name=species[3])
-    trace0 = go.Histogram(x=asizes[0], text=adesc[0], name=species[0], nbinsx = 150)
-    trace1 = go.Histogram(x=asizes[1], text=adesc[1], name=species[1], nbinsx = 150)
-    trace2 = go.Histogram(x=asizes[2], text=adesc[2], name=species[2], nbinsx = 150)
+    trace0 = go.Histogram(x=asizes[0], text=adesc[0], name=species[0], nbinsx = 100) #
+    trace1 = go.Histogram(x=asizes[1], text=adesc[1], name=species[1], nbinsx = 100) #
+    trace2 = go.Histogram(x=asizes[2], text=adesc[2], name=species[2], nbinsx = 100) #
+    
     fig = tools.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
     
     #xaxis, yaxis
@@ -118,6 +120,30 @@ def subplot_histogram_morebins(asizes, adesc, species, title, xaxislabel, filena
     fig['layout']['yaxis1'].update(title='Occurences')
     plotly.offline.plot(fig, filename=filename+"_SUBPLOT_HISTOGRAM_morebins.html")
 
+def plot_histogram_morebins_overlayed(asizes, adesc, species, title, xaxislabel, filename):
+    #global asizes, afilename, adesc
+    plotly.offline.init_notebook_mode(connected=False)
+    #trace3 = go.Histogram(x=asizes[3], name=species[3])
+    trace0 = go.Histogram(x=asizes[0], text=adesc[0], name=species[0], nbinsx = 100, opacity=0.75) #
+    trace1 = go.Histogram(x=asizes[1], text=adesc[1], name=species[1], nbinsx = 100, opacity=0.75) #
+    trace2 = go.Histogram(x=asizes[2], text=adesc[2], name=species[2], nbinsx = 100, opacity=0.75) #
+    
+    #fig = tools.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
+    
+    #xaxis, yaxis
+    #fig.append_trace(trace0, 1, 1)
+    #fig.append_trace(trace1, 2, 1)
+    #fig.append_trace(trace2, 3, 1)
+    
+    data =[trace0, trace1, trace2]
+    
+    layout = go.Layout(barmode='overlay')
+    fig = go.Figure(data=data, layout=layout)
+    
+    fig["layout"].update(title=title)
+    fig['layout']['xaxis1'].update(title=xaxislabel)
+    fig['layout']['yaxis1'].update(title='Occurences')
+    plotly.offline.plot(fig, filename=filename+"_SUBPLOT_HISTOGRAM_morebins_overlayed.html")
 
 def plotly_things(numbers, filename, desc1, desc2, desc3): #single historgram
     plotly.offline.init_notebook_mode(connected=False)
@@ -146,7 +172,7 @@ with open(fname) as f:
             #print("here", count)
             count += 1
             for i, item in enumerate(data):
-                print(i, item)
+                #print(i, item)
                 #if item == "MG94 with double and triple instantaneous substitutions - AIC-c": print(i, item)
                 #if item == "MG94 with double instantaneous substitutions - AIC-c": print(i, item)
                 #if item == "Standard MG94 - AIC-c": print(i, item)
@@ -175,14 +201,19 @@ with open(fname) as f:
            #data[8] = Triple-hit vs single-hit"
         if float(data[6]) < 0.05: significant_TripleH[0] += 1 #counts
            #print(data[8])
-        if float(data[8]) < 0.05: 
-            significant_TripleH[1] += 1 #counts
-            print("SIG",data[8])
+        if float(data[8]) < 0.05: significant_TripleH[1] += 1 #counts
+            #print("SIG",data[8])
             
         #AICc
         AICc[0].append(float(data[9])) #MG94 with double and triple instantaneous substitutions - AIC-c
         AICc[1].append(float(data[31])) #MG94 with double instantaneous substitutions - AIC-c
         AICc[2].append(float(data[52])) #Standard MG94 - AIC-c
+        
+        #AICc Differences between them.
+        diff_AICc[0].append(float(data[52]) - float(data[31])) #Difference AICc 1H vs 2H
+        diff_AICc[1].append(float(data[52]) - float(data[9]))#Difference AICc 1H vs 3H
+        diff_AICc[2].append(float(data[31]) - float(data[9]))#Difference AICc 2H vs 3H
+    
         
         #log(L)
         LL[0].append(float(data[10])) #MG94 with double and triple instantaneous substitutions - Log Likelihood
@@ -223,7 +254,11 @@ with open(fname) as f:
 #plotly_things(num_sites, "NUMSITES", "Number of sites (Alignment length)", "Number of sites analyzed", "Number of sites aligned")
 
 #subplot_histogram(AICc, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - AICc", "AICc", "AICc")
-#subplot_histogram_morebins(AICc, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - AICc", "AICc", "AICc")
+##subplot_histogram_morebins(AICc, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - AICc", "AICc", "AICc")
+
+#subplot_histogram_morebins(diff_AICc, ["","",""], ["Difference AICc 1H vs 2H", "Difference AICc 1H vs 3H","Difference AICc 2H vs 3H"], "Models comparison - difference of AICc", "Difference-AICc", "Difference-AICc")
+plot_histogram_morebins_overlayed(diff_AICc, ["","",""], ["Difference AICc 1H vs 2H", "Difference AICc 1H vs 3H","Difference AICc 2H vs 3H"], "Models comparison - difference of AICc", "Difference-AICc", "Difference-AICc")
+
 #subplot_histogram(LL, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - log(L)", "Log Likelihoods", "LogLikelihoods")
 
 #plotly_boxplot(num_sites, "NUMSITES", "Number of sites (Alignment length)", "Number of sites analyzed", "Number of sites aligned")     
@@ -243,6 +278,7 @@ with open(fname) as f:
 # Summary Statistics
 # =============================================================================
 #print(numlines-1)
+sys.exit(1)
 n = numlines - 1
 
 
@@ -259,7 +295,7 @@ print()
 #For what proportion of these rates was there a significant p-value for non-zero triple hits?
 #if "rate at which 3 nucleotides are changed instantly within a single codon" > 0.0 then
 #if "Triple-hit vs double-hit" or Triple-hit vs single-hit", p value < 0.05, count it and indicate which
-print(significant_TripleH, "Number of files: " + str(n), "\n", "Signicicant Proportion Triple-hit vs double-hit (%):", (significant_TripleH[0]/n)*100, "\n", "Significant Proportion Triple-hit vs single-hit (%):", (significant_TripleH[1]/n)*100)
+print(significant_TripleH, "Number of files: " + str(n), "\n", "Significant Proportion Triple-hit vs double-hit (%):", (significant_TripleH[0]/n)*100, "\n", "Significant Proportion Triple-hit vs single-hit (%):", (significant_TripleH[1]/n)*100)
 print()
 print("Average number of sequences:", sum(num_seqs)/ len(num_seqs))
 print(stats.describe(np.asarray(num_seqs)))
