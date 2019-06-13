@@ -26,7 +26,7 @@ TripleH_rates = []
 Genename_TripleH = []
 significant_TripleH = [0, 0]
 columns = ['File name', 'number of sequences', 'number of sites', 'Double-hit vs single-hit - LRT', 'Double-hit vs single-hit - p-value', 'Triple-hit vs double-hit - LRT', 'Triple-hit vs double-hit - p-value', 'Triple-hit vs single-hit - LRT', 'Triple-hit vs single-hit - p-value', 'MG94 with double and triple instantaneous substitutions - AIC-c', 'MG94 with double and triple instantaneous substitutions - Log Likelihood', 'Substitution rate from nucleotide A to nucleotide C', 'Substitution rate from nucleotide A to nucleotide G', 'Substitution rate from nucleotide A to nucleotide T', 'Substitution rate from nucleotide C to nucleotide G', 'Substitution rate from nucleotide C to nucleotide T', 'Substitution rate from nucleotide G to nucleotide T', 'non-synonymous/synonymous rate ratio', 'rate at which 2 nucleotides are changed instantly within a single codon', 'rate at which 3 nucleotides are changed instantly within a single codon', 'MG94 with double instantaneous substitutions - AIC-c', 'MG94 with double instantaneous substitutions - Log Likelihood', 'Substitution rate from nucleotide A to nucleotide C', 'Substitution rate from nucleotide A to nucleotide G', 'Substitution rate from nucleotide A to nucleotide T', 'Substitution rate from nucleotide C to nucleotide G', 'Substitution rate from nucleotide C to nucleotide T', 'Substitution rate from nucleotide G to nucleotide T', 'non-synonymous/synonymous rate ratio', 'rate at which 2 nucleotides are changed instantly within a single codon', 'Standard MG94 - AIC-c', 'Standard MG94 - Log Likelihood', 'Substitution rate from nucleotide A to nucleotide C', 'Substitution rate from nucleotide A to nucleotide G', 'Substitution rate from nucleotide A to nucleotide T', 'Substitution rate from nucleotide C to nucleotide G', 'Substitution rate from nucleotide C to nucleotide T', 'Substitution rate from nucleotide G to nucleotide T', 'non-synonymous/synonymous rate ratio']
-n = 500 #has to be a way to calc this
+#n = 500 #has to be a way to calc this
 
 AICc = [[], [], []]
 LL = [[], [], []]
@@ -104,9 +104,9 @@ def subplot_histogram_morebins(asizes, adesc, species, title, xaxislabel, filena
     #global asizes, afilename, adesc
     plotly.offline.init_notebook_mode(connected=False)
     #trace3 = go.Histogram(x=asizes[3], name=species[3])
-    trace0 = go.Histogram(x=asizes[0], text=adesc[0], name=species[0], nbinsx = 250)
-    trace1 = go.Histogram(x=asizes[1], text=adesc[1], name=species[1], nbinsx = 250)
-    trace2 = go.Histogram(x=asizes[2], text=adesc[2], name=species[2], nbinsx = 250)
+    trace0 = go.Histogram(x=asizes[0], text=adesc[0], name=species[0], nbinsx = 150)
+    trace1 = go.Histogram(x=asizes[1], text=adesc[1], name=species[1], nbinsx = 150)
+    trace2 = go.Histogram(x=asizes[2], text=adesc[2], name=species[2], nbinsx = 150)
     fig = tools.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
     
     #xaxis, yaxis
@@ -133,18 +133,20 @@ def plotly_boxplot(numbers, filename, desc1, desc2, desc3): #Single boxplot
     
 with open(fname) as f:
     count = 0
+    numlines = 0
     #line = f.readline()
     while True:
         line = f.readline().strip()
+        
         if line == "": break
-    
+        numlines += 1
         data = line.split(",")
         
         if count == 0:
             #print("here", count)
             count += 1
             for i, item in enumerate(data):
-                #print(i, item)
+                print(i, item)
                 #if item == "MG94 with double and triple instantaneous substitutions - AIC-c": print(i, item)
                 #if item == "MG94 with double instantaneous substitutions - AIC-c": print(i, item)
                 #if item == "Standard MG94 - AIC-c": print(i, item)
@@ -168,12 +170,15 @@ with open(fname) as f:
             Genename_TripleH.append([float(data[19]), data[0]]) # <- ADD THIS FUNCTIONALITY TO THE CSV PARSER. WHICH GENES with rates above 1.0, names, space demilited and values space delmiited
 
         #Significant non-zero Triple Hits
-        if float(data[19]) > 0.0:
+        #if float(data[19]) > 0.0:
            #data[6] =  "Triple-hit vs double-hit"
            #data[8] = Triple-hit vs single-hit"
-           if float(data[6]) < 0.05: significant_TripleH[0] += 1 #counts
-           if float(data[8]) < 0.05: significant_TripleH[1] += 1 #counts
-
+        if float(data[6]) < 0.05: significant_TripleH[0] += 1 #counts
+           #print(data[8])
+        if float(data[8]) < 0.05: 
+            significant_TripleH[1] += 1 #counts
+            print("SIG",data[8])
+            
         #AICc
         AICc[0].append(float(data[9])) #MG94 with double and triple instantaneous substitutions - AIC-c
         AICc[1].append(float(data[31])) #MG94 with double instantaneous substitutions - AIC-c
@@ -218,7 +223,7 @@ with open(fname) as f:
 #plotly_things(num_sites, "NUMSITES", "Number of sites (Alignment length)", "Number of sites analyzed", "Number of sites aligned")
 
 #subplot_histogram(AICc, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - AICc", "AICc", "AICc")
-subplot_histogram_morebins(AICc, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - AICc", "AICc", "AICc")
+#subplot_histogram_morebins(AICc, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - AICc", "AICc", "AICc")
 #subplot_histogram(LL, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - log(L)", "Log Likelihoods", "LogLikelihoods")
 
 #plotly_boxplot(num_sites, "NUMSITES", "Number of sites (Alignment length)", "Number of sites analyzed", "Number of sites aligned")     
@@ -227,6 +232,8 @@ subplot_histogram_morebins(AICc, ["","",""], ["MG94 with double and triple insta
 #subplot_boxplot(omegas, ["","",""], ["MG94 with double and triple instantaneous substitutions","MG94 with double instantaneous substitutions","Standard MG94"], "Models comparison - Omega values", "Omega", "Omega")
 
 #subplot_histogram(TestResults_pvalues, ["","",""], ["Double-hit vs single-hit - p-value","Triple-hit vs double-hit - p-value","Triple-hit vs single-hit - p-value"], "Models comparison - Fits, TestResults_pvalues", "TestResults_pvalues", "TestResults_pvalues")
+#subplot_histogram_morebins(TestResults_pvalues, ["","",""], ["Double-hit vs single-hit - p-value","Triple-hit vs double-hit - p-value","Triple-hit vs single-hit - p-value"], "Models comparison - Fits, TestResults_pvalues", "TestResults_pvalues", "TestResults_pvalues")
+
 #subplot_binnedHisto(TestResults_pvalues, ["","",""], ["Double-hit vs single-hit - p-value","Triple-hit vs double-hit - p-value","Triple-hit vs single-hit - p-value"], "Models comparison - Fits, TestResults_pvalues", "TestResults_pvalues", "TestResults_pvalues")
 
 #subplot_boxplot(LRTs, ["","",""], ["Double-hit vs single-hit","Triple-hit vs double-hit","Triple-hit vs single-hit"], "Models comparison - LRT values", "LRTs", "LRTs")
@@ -235,7 +242,10 @@ subplot_histogram_morebins(AICc, ["","",""], ["MG94 with double and triple insta
 # =============================================================================
 # Summary Statistics
 # =============================================================================
-"""
+#print(numlines-1)
+n = numlines - 1
+
+
 print("## SUMMARY STATISTICS ##", "\n")
 print("Triple Hit Rates max:", max(TripleH_rates), "min:", min(TripleH_rates), "N =", len(TripleH_rates))
 TripleH_rates = np.asarray(TripleH_rates)
@@ -249,7 +259,7 @@ print()
 #For what proportion of these rates was there a significant p-value for non-zero triple hits?
 #if "rate at which 3 nucleotides are changed instantly within a single codon" > 0.0 then
 #if "Triple-hit vs double-hit" or Triple-hit vs single-hit", p value < 0.05, count it and indicate which
-print(significant_TripleH, n, "\n", "Signicicant Proportion Triple-hit vs double-hit (%):", (significant_TripleH[0]/n)*100, "\n", "Significant Proprotion Triple-hit vs single-hit (%):", (significant_TripleH[1]/n)*100)
+print(significant_TripleH, "Number of files: " + str(n), "\n", "Signicicant Proportion Triple-hit vs double-hit (%):", (significant_TripleH[0]/n)*100, "\n", "Significant Proportion Triple-hit vs single-hit (%):", (significant_TripleH[1]/n)*100)
 print()
 print("Average number of sequences:", sum(num_seqs)/ len(num_seqs))
 print(stats.describe(np.asarray(num_seqs)))
@@ -274,9 +284,9 @@ print("#MG94 with double and triple instantaneous substitutions#\n", stats.descr
 print("#MG94 with double instantaneous substitutions#\n", stats.describe(np_LL[1]))
 print("#Standard MG94#\n", stats.describe(np_LL[2]))
 
-"""
+
       
-     
+
       
 # =============================================================================
 # End of file
