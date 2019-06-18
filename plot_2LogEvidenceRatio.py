@@ -13,6 +13,7 @@ https://docs.scipy.org/doc/numpy/reference/generated/numpy.log.html
 
 find /home/aglucaci/TRIPLE_HITS/data/selectome_trip_ammended -empty -type f -delete
 ls -lahS ../data/selectome_trip_ammended/*.FITTER.json | wc -l
+tar -czvf SELECTOME_TRIP_AMMENDED_FITTER_JSON.tar.gz /SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON
 """
 
 # =============================================================================
@@ -29,8 +30,9 @@ import json, csv, os
 init_notebook_mode(connected=True)
 
 #BUSTED Folder
-directory = r"E:\BUSTED_SIM_SRV\BUSTED_SIM_SRV"
-filename = ["allOis1_D_100_replicate.1.FITTER.json"]
+#directory = r"E:\BUSTED_SIM_SRV\BUSTED_SIM_SRV"
+directory = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
+#filename = ["allOis1_D_100_replicate.1.FITTER.json"]
 
 #Parse the json
 #Three_hit = [1.001390014360347, 0.9979394029716767, 0.9991241285782849, 1.00127426088317, 0.9985354235854298, 0.9984709455099117, 1.002073311216048, 1.001780281971484, 0.9996103496053033, 1.000756993536668, 1.001991321041256, 1.001680820654508, 1.00463814088762, 1.000043670384645, 0.9981814422553464, 1.000678275074349, 0.9983030440783975, 0.9996434577286832, 0.9998273490880808, 1.000902611347252, 1.001958611016499, 1.000046518632957, 0.9994021901316387, 0.9997382936142335, 1.001932067658296, 0.9987912194703059, 0.9970088386992207, 1.002281105509041, 0.9996634241867047, 0.9997124432731236, 1.000049727304403, 0.9994444639708604, 0.9986522408602755, 1.001944188684811, 1.000299876184699, 0.9976521575025862, 1.001401018378705, 1.001480452953043, 0.9976724401957808, 0.9991589066816811, 0.9980252536464759, 0.9990782285301462, 1.00214852768521, 0.9997288393086416, 0.9985201710290084, 0.9989490074603672, 0.9997767649428708, 0.9982451577557709, 1.002567689222285, 0.9986099280119436, 1.000206099410766, 1.000126910387006, 0.9993446275647343, 0.9996217929220677, 0.9976373949883331, 0.9981304397515073, 1.000014505775352, 0.9998711377442343, 1.001557516147573, 1.000089944257751, 0.9984067241725637, 0.9967236504002286, 0.9997132423844047, 1.000451679998051, 0.9988674849245973, 1.001340793810113, 0.9998968296868783, 1.00362294982541, 0.9986113684723351, 0.9977371138640617, 1.003307041682187, 1.000291931367852, 0.9996722442165997, 1.00057035685794, 1.001882078864379, 1.000082967573986, 0.998013258374147, 0.9985417296750307, 1.000512134400817, 0.9988388596103609, 0.9991457648894445, 1.002090322042013, 0.9986149003824069, 1.002970044779094, 0.9977407796450749, 0.9977958728480721, 1.001302552432428, 1.001144734810204, 1.002224581906339, 0.999915145175538, 0.9998619476056276, 0.9989105462984541, 0.9991141643247188, 1.00274718246144, 1.000506606291668, 1.001665385765126, 0.997853069830942, 1.001697027866775, 1.000640339735564, 0.9998218926358561] 
@@ -58,16 +60,9 @@ def load_json(filename):
     return TH, DH, np.arange(1, int(SITES) + 1)
 
 def plotly_basicline(data_x, data_y_TH, data_y_DH, output):
-    # Create a trace
-    #trace0 = go.Scatter(x = Sites, y = 2*np.log(Three_hit))
-    #trace1 = go.Scatter(x = Sites, y = 2*np.log(Two_hit))
-
-    #trace0 = go.Scatter(x = data_x, y = 2*np.log(data_y_TH), mode = 'lines+markers', name="Three Hit")
-    #trace1 = go.Scatter(x = data_x, y = 2*np.log(data_y_DH), mode = 'lines+markers', name="Double Hit")
-    
+    # Create trace(s)
     trace0 = go.Scatter(x = data_x, y = data_y_TH, mode = 'lines+markers', name="Three Hit", opacity=0.75)
     trace1 = go.Scatter(x = data_x, y = data_y_DH, mode = 'lines+markers', name="Double Hit", opacity=0.75)
-    
     data = [trace0, trace1]
     
     layout = dict(title = '2*LN(Evidence Ratio), Number of Sites = ' + str(len(data_x)) + ", " + output, 
@@ -86,7 +81,6 @@ def plotly_basicline(data_x, data_y_TH, data_y_DH, output):
 def main_sub(filename, output):
     #Load data from .FITTER.json
     EvidenceRatio_TH, EvidenceRatio_DH, Sites = load_json(filename)
-    
     #print(EvidenceRatio_TH)
     
     #Transform evidence ratios by applying 2*LN(evidence_ratio)
@@ -97,24 +91,23 @@ def main_sub(filename, output):
     plotly_basicline(Sites, tx2_Ln_EvidenceRatio_TH, tx2_Ln_EvidenceRatio_DH, output)
     
     #Done.
-    #plotly_basicline(Sites, Three_hit, Two_hit, "")
 
 
-#Starting program... 
+# =============================================================================
+# Starting program..
+# =============================================================================
 #main_sub(filename[0])
-    
 count = 0
 for root, dirs, files in os.walk(directory):
     for each_file in files:
         name, ext = os.path.splitext(each_file)
-        existing = os.path.join (directory, name + ext)
-        if not os.path.isfile(existing + ".html"):
-            print(count, "Generating plot:", existing, each_file)
-            #main_sub(existing)
-            count +=1
-        
-        
-
+        if ext == ".json":
+            existing = os.path.join(directory, name + ext)
+            if not os.path.isfile(existing + ".html"):
+                count +=1
+                print(count, "Generating plot:", existing) #each_file, [ext])
+                main_sub(existing)
+            
 # =============================================================================
 # End of file
 # =============================================================================
