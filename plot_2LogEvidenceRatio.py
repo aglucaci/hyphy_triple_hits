@@ -9,6 +9,7 @@ https://plot.ly/python/line-charts/
 https://docs.scipy.org/doc/numpy/reference/generated/numpy.log.html
 
 find /home/aglucaci/TRIPLE_HITS/data/selectome_trip_ammended -empty -type f -delete
+ls -lahS ../data/selectome_trip_ammended/*.FITTER.json | wc -l
 """
 
 # =============================================================================
