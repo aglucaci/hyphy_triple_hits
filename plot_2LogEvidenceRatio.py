@@ -106,7 +106,7 @@ for root, dirs, files in os.walk(directory):
             if not os.path.isfile(existing + ".html"):
                 count +=1
                 print(count, "Generating plot:", existing) #each_file, [ext])
-                main_sub(existing)
+                main_sub(existing, each_file)
             
 # =============================================================================
 # End of file
