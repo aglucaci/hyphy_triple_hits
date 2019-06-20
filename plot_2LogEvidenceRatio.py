@@ -14,6 +14,13 @@ https://docs.scipy.org/doc/numpy/reference/generated/numpy.log.html
 find /home/aglucaci/TRIPLE_HITS/data/selectome_trip_ammended -empty -type f -delete
 ls -lahS ../data/selectome_trip_ammended/*.FITTER.json | wc -l
 tar -czvf SELECTOME_TRIP_AMMENDED_FITTER_JSON.tar.gz /SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON
+
+
+floating points in python; https://docs.python.org/3.4/tutorial/floatingpoint.html
+issues with f and mu
+
+
+ mkdir /home-silverback/aglucaci/TRIPLE_HITS/analysis/SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_ADDITIONAL
 """
 
 # =============================================================================
@@ -23,15 +30,24 @@ import plotly.graph_objs as go
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import numpy as np
 import json, csv, os
+from shutil import copyfile
 
+#copyfile(src, dst)
 # =============================================================================
 # Declares
 # =============================================================================
 init_notebook_mode(connected=True)
 
 #BUSTED Folder
-#directory = r"E:\BUSTED_SIM_SRV\BUSTED_SIM_SRV"
-directory = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
+directory = r"E:\BUSTED_SIM_SRV_FITTER_JSON\BUSTED_SIM_SRV_FITTER_JSON"
+#directory = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
+#directory = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_ADDITIONAL\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_ADDITIONAL" #check this against output dir
+
+##output_dir = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_HTML" #main one
+output_dir = r"E:\BUSTED_SIM_SRV_FITTER_JSON\BUSTED_SIM_SRV_FITTER_JSON_HTML"
+
+#output_dir_suppl = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_HTML\Supplement"
+#output_dir_suppl_FITTERs = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_HTML\Supplement\FITTER_JSON"
 #filename = ["allOis1_D_100_replicate.1.FITTER.json"]
 
 #Parse the json
@@ -48,6 +64,7 @@ directory = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED
 # =============================================================================
 
 def load_json(filename):
+    print("() Loading:", filename)
     with open(filename, "r") as fh:
         json_data = json.load(fh)
         #print(json_data["Evidence Ratios"]["Three-hit"])
@@ -57,15 +74,18 @@ def load_json(filename):
         DH = json_data["Evidence Ratios"]["Two-hit"][0]
         SITES = json_data["input"]["number of sites"] #can also calculated from the len of DH or TH
     fh.close()
-    return TH, DH, np.arange(1, int(SITES) + 1)
+    return TH, DH, np.arange(1, int(SITES) + 1) #1-Index
+    #return TH, DH, np.arange(0, int(SITES))
 
-def plotly_basicline(data_x, data_y_TH, data_y_DH, output):
+def plotly_basicline(data_x, data_y_TH, data_y_DH, output_title, output):
+    global output_dir
+    #print("()DEBUG:", output_dir)
     # Create trace(s)
     trace0 = go.Scatter(x = data_x, y = data_y_TH, mode = 'lines+markers', name="Three Hit", opacity=0.75)
     trace1 = go.Scatter(x = data_x, y = data_y_DH, mode = 'lines+markers', name="Double Hit", opacity=0.75)
     data = [trace0, trace1]
     
-    layout = dict(title = '2*LN(Evidence Ratio), Number of Sites = ' + str(len(data_x)) + ", " + output, 
+    layout = dict(title = '2*LN(Evidence Ratio), Number of Sites = ' + str(len(data_x)) + ", " + output_title, 
                   xaxis = dict(title = 'SITE'), 
                   yaxis = dict(title = '2*LN(Evidence Ratio)'),)
     
@@ -73,12 +93,22 @@ def plotly_basicline(data_x, data_y_TH, data_y_DH, output):
     
     #plot(data, filename='basic-line_2LogN_EvidenceRATIO.html')
     #plot(fig, filename='basic-line_2LogN_EvidenceRATIO.html')
-    plot(fig, filename=output+".html")
+    
+    #plot(fig, filename=output+".html")
+    #output_dir = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_HTML"
+    #output_file = os.path.join(output_dir_suppl, output_title + ".html")
+    #print(output, output_title, output_file)
+    
+    #plot(fig, filename=output_file, auto_open=False) #auto_open=False for sanity.
+    output_file = os.path.join(output_dir, output_title + ".html")
+    print("() SAVING:", output_file)
+    plot(fig, filename=output_file, auto_open=False) #auto_open=False for sanity.
     
 # =============================================================================
 # Main subrout.
 # =============================================================================
-def main_sub(filename, output):
+def main_sub(filename, output_title):
+    #print("()MAINSUB:", filename)
     #Load data from .FITTER.json
     EvidenceRatio_TH, EvidenceRatio_DH, Sites = load_json(filename)
     #print(EvidenceRatio_TH)
@@ -87,12 +117,11 @@ def main_sub(filename, output):
     tx2_Ln_EvidenceRatio_TH = 2*np.log(EvidenceRatio_TH) 
     tx2_Ln_EvidenceRatio_DH = 2*np.log(EvidenceRatio_DH)
     
+    #print("()MAINSUB[2]:", filename)
     #Plot (simple line) the two traces on the same plot.
-    plotly_basicline(Sites, tx2_Ln_EvidenceRatio_TH, tx2_Ln_EvidenceRatio_DH, output)
+    plotly_basicline(Sites, tx2_Ln_EvidenceRatio_TH, tx2_Ln_EvidenceRatio_DH, output_title, filename)
     
-    #Done.
-
-
+    
 # =============================================================================
 # Starting program..
 # =============================================================================
@@ -102,10 +131,14 @@ for root, dirs, files in os.walk(directory):
     for each_file in files:
         name, ext = os.path.splitext(each_file)
         if ext == ".json":
-            existing = os.path.join(directory, name + ext)
+            #existing = os.path.join(directory, name + ext)
+            existing = os.path.join(output_dir, name + ext)
             if not os.path.isfile(existing + ".html"):
+                existing = os.path.join(directory, name + ext)
+                #copy_FITTER = os.path.join(output_dir_suppl_FITTERs, name + ext)
                 count +=1
-                print(count, "Generating plot:", existing) #each_file, [ext])
+                print(count, "Generating plot:", existing) #, each_file, [ext])
+                #if not os.path.isfile(copy_FITTER): copyfile(existing, copy_FITTER)
                 main_sub(existing, each_file)
             
 # =============================================================================
