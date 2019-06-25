@@ -28,6 +28,7 @@ import numpy as np
 import json, csv, os, sys
 from shutil import copyfile
 import csv
+from scipy import stats
 
 #copyfile(src, dst)
 # =============================================================================
@@ -42,6 +43,27 @@ init_notebook_mode(connected=True)
 # --- SELECTOME_TRIP_AMMENDED_SRV
 directory = r"E:\SELECTOME_TRIP_AMMENDED_SRV\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
 output_dir = r"E:\SELECTOME_TRIP_AMMENDED_SRV\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_HTML"
+fname = "analysis_ER_pvalue0005_Serines.txt" #Output file
+pvalue_threshold = 0.005
+##
+##
+"""
+Found 2679 with p value < 0.005, averaging 3 Sites above TH ER_threshold
+TH_ER_Threshold is
+
+if you look at the evidence ratio values, is it common to find only a few sites driving the signal towards that model? avg 3
+and do these sites have serine codons?:
+    
+Number of sites, with Serine -> Serine changes
+    
+"""
+custom_analysis = {}
+custom_analysis["NumOfSites"] = [] #Number of sites for significant files. What is the average?
+
+#https://cdn.kastatic.org/ka-perseus-images/f5de6355003ee322782b26404ef0733a1d1a61b0.png
+SERINE_CODONS = ["TCT", "TCC", "TCA", "TCG", "AGT", "AGC"]
+TH_Sites_avg = []
+
 
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
@@ -62,13 +84,14 @@ def load_json(filename, file_count):
         TH = json_data["Evidence Ratios"]["Three-hit"][0]
         DH = json_data["Evidence Ratios"]["Two-hit"][0]
         SITES = json_data["input"]["number of sites"] #can also calculated from the len of DH or TH
+        THvsDH_LRT_pvalue = json_data["test results"]["Triple-hit vs double-hit"]["p-value"]
         Site_subs = json_data["Site substitutions"]
         #TEST RESULTS
         
     fh.close()
     #return TH, DH, np.arange(1, int(SITES) + 1), Site_subs #1-Index
     #return TH, DH, np.arange(0, int(SITES))
-    return TH, DH, np.arange(0, int(SITES)), Site_subs
+    return TH, DH, np.arange(0, int(SITES)), Site_subs, THvsDH_LRT_pvalue
 
 def plotly_basicline(data_x, data_y_TH, data_y_DH, output_title, output):
     global output_dir
@@ -101,10 +124,12 @@ def plotly_basicline(data_x, data_y_TH, data_y_DH, output_title, output):
 # Main subrout.
 # =============================================================================
 def main_sub(filename, output_title, file_count):
+    global fname, pvalue_threshold, TH_Sites_avg 
     #print("()MAINSUB:", filename)
     #Load data from .FITTER.json
-    EvidenceRatio_TH, EvidenceRatio_DH, Sites, Site_subs = load_json(filename, file_count)
+    EvidenceRatio_TH, EvidenceRatio_DH, Sites, Site_subs, THvsDH_LRT_pvalue = load_json(filename, file_count)
     #print(EvidenceRatio_TH)
+    if float(THvsDH_LRT_pvalue) >= pvalue_threshold: return
     
     #Transform evidence ratios by applying 2*LN(evidence_ratio)
     #tx2_Ln_EvidenceRatio_TH = 2*np.log(EvidenceRatio_TH) 
@@ -134,11 +159,11 @@ def main_sub(filename, output_title, file_count):
     msg = []
     
     msg.append(filename.split("\\")[-1]) 
-    #msg.append(len(Sites))
+    msg.append(str(len(Sites)))
     msg.append(str(np.mean(EvidenceRatio_TH)))
     msg.append(str(np.mean(EvidenceRatio_DH)))
     msg.append(str(Threshold_TH))
-    msg.append(str(Threshold_DH))
+    msg.append(str(Threshold_DH)) #
     
     #filter
     #http://book.pythontips.com/en/latest/map_filter.html
@@ -146,10 +171,15 @@ def main_sub(filename, output_title, file_count):
     Filtered_Threshold_TH = list(filter(lambda x: x > Threshold_TH, EvidenceRatio_TH))
     Filtered_Threshold_DH = list(filter(lambda x: x > Threshold_DH, EvidenceRatio_DH))
     
+    print("THvsDH LRT pvalueL", THvsDH_LRT_pvalue)
+    msg.append(str(THvsDH_LRT_pvalue))
+    
     if Filtered_Threshold_TH > []:
         msg.append(str(len(Filtered_Threshold_TH)))
         
         print("Number of TH sites:", len(Filtered_Threshold_TH))
+        TH_Sites_avg.append(len(Filtered_Threshold_TH))
+        
         #post prociessing
         for i, item in enumerate(EvidenceRatio_TH):
             if item in Filtered_Threshold_TH:
@@ -160,22 +190,31 @@ def main_sub(filename, output_title, file_count):
                 try:
                     print("TH_ Location, Value:", i, item, Site_subs[str(i)])
                     msg.append("{" + str(i) + ": " + str(Site_subs[str(i)]) + "}")
-
+                    
+                    #Serine analysis
+                    
                 except:
                     print("TH_ Location, Value:", i, item, "SITE SUB NOT FOUND IN JSON")
-                    msg.append(str(i) + " SITE SUB NOT FOUND IN JSON" )
+                    #msg.append(str(i) + " SITE SUB NOT FOUND IN JSON" )
+                    msg.append("{" + str(i) + ": " + "NA" + "}")
                     #print(Site_subs)
                     #for key in Site_subs:
                     #    print(key, Site_subs[key])
                         
                 #sys.exit(1)
-    
+                
+    else: 
+        msg.append("0") #Spacer for Number of TH Sites
+        msg.append("NA") #Spacer for Location, Value
+        
+
     
     #write msg to file.
     with open(fname, 'a') as f:
         #for item in msg:
             #f.write("%s\n" % item)
-        f.write(", ".join(msg) + "\n")
+        #f.write(", ".join(msg) + "\n")
+        f.write("\t ".join(msg) + "\n")
     f.close()
                 
     """            
@@ -210,16 +249,15 @@ def main_sub(filename, output_title, file_count):
 # =============================================================================
 #main_sub(filename[0])
 print("() Starting Evidence ratio analysis")
-file_count, count = 0, 0 #Analysis, Plotting respectively.
+file_count, count = 0, 0 #For Analysis, Plotting respectively.
 
-#Init. Output file
-
-fname = "analysis_ER.txt"
-header = ["Filename, Total Num of Sites, TH Mean, DH Mean, TH Threshold, DH Threshold, TH - Num of Sites, TH Sites Location & Codon"]
+# -- Init. Output file
+header = ["Filename", "Total Num of Sites", "TH Mean", "DH Mean", "TH Threshold", "DH Threshold", "THvsDH_LRT_pvalue", "TH - Num of Sites", "TH Sites Location & Codon"]
 with open(fname, 'w') as f:
     #for item in header:
         #f.write("%s" % item)
-    f.write(",".join(header) + "\n")
+    #f.write(", ".join(header) + "\n")
+    f.write("\t ".join(header) + "\n")
 f.close()
 
 
@@ -244,8 +282,14 @@ for root, dirs, files in os.walk(directory):
             existing = os.path.join(directory, name + ext)
             main_sub(existing, each_file, file_count)
             file_count += 1
+            if file_count == 12: break
             
             
+# SUMARY STATISTICS
+
+print("\n", stats.describe(np.asarray(TH_Sites_avg)))
+
+
 # =============================================================================
 # End of file
 # =============================================================================
@@ -304,10 +348,6 @@ plot(data, filename='basic-line_2LogN_EvidenceRATIO.html')
 """
 
 # --- # --- #
-
-
-
-
 
 """ Sample data from: allOis1_D_100_replicate.1.FITTER.json """
 
