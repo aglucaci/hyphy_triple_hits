@@ -25,8 +25,9 @@ issues with f and mu
 import plotly.graph_objs as go
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import numpy as np
-import json, csv, os
+import json, csv, os, sys
 from shutil import copyfile
+import csv
 
 #copyfile(src, dst)
 # =============================================================================
@@ -62,10 +63,12 @@ def load_json(filename, file_count):
         DH = json_data["Evidence Ratios"]["Two-hit"][0]
         SITES = json_data["input"]["number of sites"] #can also calculated from the len of DH or TH
         Site_subs = json_data["Site substitutions"]
+        #TEST RESULTS
         
     fh.close()
-    return TH, DH, np.arange(1, int(SITES) + 1), Site_subs #1-Index
+    #return TH, DH, np.arange(1, int(SITES) + 1), Site_subs #1-Index
     #return TH, DH, np.arange(0, int(SITES))
+    return TH, DH, np.arange(0, int(SITES)), Site_subs
 
 def plotly_basicline(data_x, data_y_TH, data_y_DH, output_title, output):
     global output_dir
@@ -100,7 +103,7 @@ def plotly_basicline(data_x, data_y_TH, data_y_DH, output_title, output):
 def main_sub(filename, output_title, file_count):
     #print("()MAINSUB:", filename)
     #Load data from .FITTER.json
-    EvidenceRatio_TH, EvidenceRatio_DH, Sites, Site_subs= load_json(filename, file_count)
+    EvidenceRatio_TH, EvidenceRatio_DH, Sites, Site_subs = load_json(filename, file_count)
     #print(EvidenceRatio_TH)
     
     #Transform evidence ratios by applying 2*LN(evidence_ratio)
@@ -124,31 +127,81 @@ def main_sub(filename, output_title, file_count):
     print("Triple hit - Threshold", Threshold_TH)
     print("Double hit - Threshold", Threshold_DH)
     print("Number of Sites:", len(Sites))
-    print(Site_subs)
+    #print(Site_subs)
     
-    header = "Filename, Total Num of Sites, TH Mean, DH Mean, TH Threshold, DH Threshold, TH - Num of Sites, DH Num of Sites, TH Sites Location & Codon, DH Sites Location & Codon)"
+    #header = "Filename, Total Num of Sites, TH Mean, DH Mean, TH Threshold, DH Threshold, TH - Num of Sites, DH Num of Sites, TH Sites Location & Codon, DH Sites Location & Codon)"
+    #header = ["Filename, Total Num of Sites, TH Mean, DH Mean, TH Threshold, DH Threshold, TH - Num of Sites, TH Sites Location & Codon"]
     msg = []
     
     msg.append(filename.split("\\")[-1]) 
     #msg.append(len(Sites))
-    msg.append(np.mean(EvidenceRatio_TH))
-    msg.append(np.mean(EvidenceRatio_DH))
-    msg.append(Threshold_TH)
-    msg.append(Threshold_DH)
+    msg.append(str(np.mean(EvidenceRatio_TH)))
+    msg.append(str(np.mean(EvidenceRatio_DH)))
+    msg.append(str(Threshold_TH))
+    msg.append(str(Threshold_DH))
     
     #filter
     #http://book.pythontips.com/en/latest/map_filter.html
+    
     Filtered_Threshold_TH = list(filter(lambda x: x > Threshold_TH, EvidenceRatio_TH))
     Filtered_Threshold_DH = list(filter(lambda x: x > Threshold_DH, EvidenceRatio_DH))
     
     if Filtered_Threshold_TH > []:
+        msg.append(str(len(Filtered_Threshold_TH)))
+        
+        print("Number of TH sites:", len(Filtered_Threshold_TH))
         #post prociessing
         for i, item in enumerate(EvidenceRatio_TH):
             if item in Filtered_Threshold_TH:
-                print("Location, Value:", i, item)
+                #print("TH_ Location, Value:", i, item)
+                #print("TH_ Location, Value:", i, item, Site_subs[str(i)])
+                #print("TH_ Location, Value:", i, item, Site_subs[str(i)])
+                
+                try:
+                    print("TH_ Location, Value:", i, item, Site_subs[str(i)])
+                    msg.append("{" + str(i) + ": " + str(Site_subs[str(i)]) + "}")
+
+                except:
+                    print("TH_ Location, Value:", i, item, "SITE SUB NOT FOUND IN JSON")
+                    msg.append(str(i) + " SITE SUB NOT FOUND IN JSON" )
+                    #print(Site_subs)
+                    #for key in Site_subs:
+                    #    print(key, Site_subs[key])
+                        
+                #sys.exit(1)
     
-    print("FILTERED TH:", Filtered_Threshold_TH)
-    print("FILTERED DH:", Filtered_Threshold_DH)
+    
+    #write msg to file.
+    with open(fname, 'a') as f:
+        #for item in msg:
+            #f.write("%s\n" % item)
+        f.write(", ".join(msg) + "\n")
+    f.close()
+                
+    """            
+    elif Filtered_Threshold_DH > []:
+        for i, item in enumerate(EvidenceRatio_DH):
+            if item in Filtered_Threshold_DH:
+                try:
+                    print("DH_ Location, Value:", i, item, Site_subs[i])
+                    pass
+                except:
+                    print("DH_ Location, Value:", i, item, "SITE SUB NOT FOUND IN JSON")
+                    pass
+    """   
+            
+    """
+    site_subs_count = 0
+    Filtered_Threshold_TH = []
+    for i, item in enumerate(EvidenceRatio_TH):
+        if item > Threshold_TH:
+            Filtered_Threshold_TH.append(item)
+            #print(site_subs_count, "TH_ Location, Value:", i, item)
+            print(site_subs_count, "TH_ Location, Value:", i, item, Site_subs[str(i)])
+            site_subs_count += 1
+    """        
+    #print("FILTERED TH:", Filtered_Threshold_TH)
+    #print("FILTERED DH:", Filtered_Threshold_DH)
     #print(",".join(msg))
 
     
@@ -158,6 +211,17 @@ def main_sub(filename, output_title, file_count):
 #main_sub(filename[0])
 print("() Starting Evidence ratio analysis")
 file_count, count = 0, 0 #Analysis, Plotting respectively.
+
+#Init. Output file
+
+fname = "analysis_ER.txt"
+header = ["Filename, Total Num of Sites, TH Mean, DH Mean, TH Threshold, DH Threshold, TH - Num of Sites, TH Sites Location & Codon"]
+with open(fname, 'w') as f:
+    #for item in header:
+        #f.write("%s" % item)
+    f.write(",".join(header) + "\n")
+f.close()
+
 
 print("() Checking for json files in:", directory)
 for root, dirs, files in os.walk(directory):
