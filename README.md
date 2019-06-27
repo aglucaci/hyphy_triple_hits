@@ -22,3 +22,7 @@ analysis_EvidenceRatio.py
 
 directoryscanner.py
 -used for submitting jobs to cluster, outdated
+
+NEXUS_Datatype_P_DNA.py
+-ammends/corrects some mislabelling of Selectome datasets
+-DNA sequences labelled as Protein
