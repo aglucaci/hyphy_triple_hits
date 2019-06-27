@@ -11,7 +11,7 @@ Serine_to_Serine.py
 -to understand codon changes, allows for LRT p-value & ER thresholding 
 -uses some code from "grab_site_substituion_data.py "
 
-grab_site_substituion_data.py 
+grab_site_substitution_data.py 
 -For circos, creates the data matrix which is used to generate the plot.
 
 plot_2LogEvidenceRatio.py
