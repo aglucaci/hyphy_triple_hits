@@ -13,3 +13,9 @@ Serine_to_Serine.py
 
 grab_site_substituion_data.py 
 -For circos, creates the data matrix which is used to generate the plot.
+
+analysis_EvidenceRatio.py
+-Generates 2*LN*EvidenceRatio plots.
+
+directoryscanner.py
+-used for submitting jobs to cluster, outdated
