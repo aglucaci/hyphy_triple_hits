@@ -15,6 +15,7 @@ https://plot.ly/create/#/
 # =============================================================================
 import json, csv, sys, os
 import pandas as pd
+import numpy as np
 
 # =============================================================================
 # Declares
@@ -61,7 +62,7 @@ def subprocessing_thisrow(this_row):
                         else:
                             codon_change[from_codon][to_codon] += len(this_row[0][k][from_codon][to_codon])
 
-def read_json(filename):
+def read_json_fullfilter(filename): #Pvalue and ER Thresholdings for sensitive sites
     global codon_change, file_passed_threshold, num_ER_thresholded_sites
     this_row = []
     with open(filename, "r") as fh:
@@ -79,16 +80,46 @@ def read_json(filename):
         for i, item in enumerate(EvidenceRatio_TH):
             if item in Filtered_Threshold_TH:
                 try:
-                    print(i, "{'" + str(i) + "': " + str(Site_subs[str(i)]) + "}")
+                    #print(i, "{'" + str(i) + "': " + str(Site_subs[str(i)]) + "}")
                     this_row.append({i: Site_subs[str(i)]})
                     #can do analysis here.
                 except:
                     #SITE SUB NOT FOUND
                     #print("ERROR:", i, "{'" + str(i) + "': " + str(Site_subs[str(i)]) + "}")
-                    print("ERROR:", i, "SITE SUB NOT FOUND")
+                    #print("ERROR:", i, "SITE SUB NOT FOUND")
+                    pass
         file_passed_threshold += 1
     fh.close()
     
+    if len(this_row) == 0: return
+    subprocessing_thisrow(this_row)
+  
+def read_json_p_filter(filename): #Pvalue and ER Thresholdings for sensitive sites
+    global codon_change, file_passed_threshold, num_ER_thresholded_sites
+    this_row = []
+    with open(filename, "r") as fh:
+        json_data = json.load(fh)
+        THvsDH_LRT_pvalue = json_data["test results"]["Triple-hit vs double-hit"]["p-value"]
+        #EvidenceRatio_TH = json_data["Evidence Ratios"]["Three-hit"][0]
+        Site_subs = json_data["Site substitutions"]
+        #Filtering
+        if float(THvsDH_LRT_pvalue) >= pvalue_threshold: return #P VALUE THRESHOLDs
+        this_row.append(Site_subs)
+        file_passed_threshold += 1
+    fh.close()
+    
+    if len(this_row) == 0: return
+    subprocessing_thisrow(this_row)
+    
+def read_json_nofilter(filename):
+    global codon_change, file_passed_threshold, num_ER_thresholded_sites
+    this_row = []
+    with open(filename, "r") as fh:
+        json_data = json.load(fh)
+        Site_subs = json_data["Site substitutions"]
+        file_passed_threshold += 1
+    fh.close()
+    this_row.append(Site_subs)
     if len(this_row) == 0: return
     subprocessing_thisrow(this_row)
 
@@ -96,40 +127,65 @@ def read_json(filename):
 # =============================================================================
 # Main subroutine
 # =============================================================================
-file_count = 0
-for file in files:
-    print(file_count, "Processing:", file)
-    read_json(file)
-    file_count += 1
+def main_sub(output_filename, mode):
+    file_count = 0
+    for file in files:
+        #print(file_count, "Processing:", file)
+        if mode == "NOFILTER": read_json_nofilter(file)
+        if mode == "P_FILTER": read_json_p_filter(file)
+        if mode == "FULLFILTER": read_json_fullfilter(file)
+        
+        file_count += 1
+        
+    #Sum this.
+    triple_changes = 0
+    SERINE_to_SERINE = 0
+    SERINE_CODONS = ["TCT", "TCC", "TCA", "TCG", "AGT", "AGC"]
     
-#SUM THIS SHIT.
-triple_changes = 0
-SERINE_to_SERINE = 0
-SERINE_CODONS = ["TCT", "TCC", "TCA", "TCG", "AGT", "AGC"]
-
-""" This is on triple instant. changes"""
-for key in codon_change:
-    #print(key, codon_change[key])
-    for second_key in codon_change[key]:
-        #if diff_count(key, second_key) == 3:
-        triple_changes += codon_change[key][second_key]
-        if key in SERINE_CODONS and second_key in SERINE_CODONS: SERINE_to_SERINE += codon_change[key][second_key]
+    """ This is on triple instant. changes"""
+    for key in codon_change:
+        #print(key, codon_change[key])
+        for second_key in codon_change[key]:
+            #if diff_count(key, second_key) == 3:
+            triple_changes += codon_change[key][second_key]
+            if key in SERINE_CODONS and second_key in SERINE_CODONS: SERINE_to_SERINE += codon_change[key][second_key]
+        
+    print("Number of files:", file_passed_threshold)
+    if mode == "FULLFILTER": print("Number of ER Thresholded Sites:", num_ER_thresholded_sites)
+    print("Total number of triple changes observed:", triple_changes)
+    print("TH: Serine to Serine changesT:", SERINE_to_SERINE)
     
-print("p < 0.005, TH Threshold (10x)") 
-print("Number of files:", file_passed_threshold)
-print("Number of ER Thresholded Sites:", num_ER_thresholded_sites)
-print("Total number of triple changes observed:", triple_changes)
-print("TH: Serine to Serine changesT:", SERINE_to_SERINE)
-
-df1 = pd.DataFrame.from_dict(codon_change)
-df1.fillna("-", inplace=True)
-df1.to_csv("TEST_ORIGINAL_sample_circos_data_TripleHit_SELECTOME_SRV.txt", sep="\t")
+    #df1 = pd.DataFrame.from_dict(codon_change)
+    #df1.fillna("-", inplace=True)
+    #df1.to_csv("TEST_ORIGINAL_sample_circos_data_TripleHit_SELECTOME_SRV.txt", sep="\t")
 
 
+# =============================================================================
+# Main main
+# =============================================================================
+print("() No filter analysis") 
+main_sub("", "NOFILTER")
+
+codon_change, file_passed_threshold, num_ER_thresholded_sites = {}, 0 , 0
+print("() p < 0.005") 
+main_sub("", "P_FILTER")
+
+codon_change, file_passed_threshold, num_ER_thresholded_sites = {}, 0 , 0
+print("() p < 0.005, TH Threshold (3x)") 
+main_sub("", "FULLFILTER")
+
+codon_change, file_passed_threshold, num_ER_thresholded_sites = {}, 0 , 0
+print("() p < 0.005, TH Threshold (10x)") #REMEMBER TO CHANGE THE THRESHOLD IN THE FUNCTION
+main_sub("", "FULLFILTER")
+
+
+#need to run this three times.
+#different output files
+#differnt modes
 # =============================================================================
 # End of file
 # =============================================================================
-    """
+"""
     for k in this_row[0]:
         for keys in this_row[0][k]:
             for to_codon in this_row[0][k][keys]:
@@ -147,7 +203,7 @@ df1.to_csv("TEST_ORIGINAL_sample_circos_data_TripleHit_SELECTOME_SRV.txt", sep="
                         
                         else:
                             codon_change[from_codon][to_codon] += len(this_row[0][k][from_codon][to_codon])
-    """
+"""
 
 
 
