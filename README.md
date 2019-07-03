@@ -11,6 +11,11 @@ Serine_to_Serine.py
 -to understand codon changes, allows for LRT p-value & ER thresholding 
 -uses some code from "grab_site_substituion_data.py "
 
+physiochemical_triple_changes.py
+-a modification of the Serine_to_Serine.py script.
+-Checks for physiochemical changes with respect to the R group (Nonpolar, Polar, Aromatic, Positive, Negative)
+-Used to make a sankey diagram for viz.
+
 grab_site_substitution_data.py 
 -For circos, creates the data matrix which is used to generate the plot.
 
