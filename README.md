@@ -6,6 +6,7 @@ parse_fitter_json.py
 
 plot_csv.py
 -takes csv from above and generates plots (bar, box, subplots, overlays, etc).
+-also provides some statistical analysis of the CSV.
 
 Serine_to_Serine.py
 -to understand codon changes, allows for LRT p-value & ER thresholding 
