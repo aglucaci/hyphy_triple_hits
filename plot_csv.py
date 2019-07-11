@@ -26,7 +26,7 @@ num_sites = []
 Dh_vs_Sh = []
 TripleH_rates = []
 Genename_TripleH = []
-significant_TripleH = [0, 0]
+significant_LRTpvalue = [0, 0, 0]
 columns = ['File name', 'number of sequences', 'number of sites', 'Double-hit vs single-hit - LRT', 'Double-hit vs single-hit - p-value', 'Triple-hit vs double-hit - LRT', 'Triple-hit vs double-hit - p-value', 'Triple-hit vs single-hit - LRT', 'Triple-hit vs single-hit - p-value', 'MG94 with double and triple instantaneous substitutions - AIC-c', 'MG94 with double and triple instantaneous substitutions - Log Likelihood', 'Substitution rate from nucleotide A to nucleotide C', 'Substitution rate from nucleotide A to nucleotide G', 'Substitution rate from nucleotide A to nucleotide T', 'Substitution rate from nucleotide C to nucleotide G', 'Substitution rate from nucleotide C to nucleotide T', 'Substitution rate from nucleotide G to nucleotide T', 'non-synonymous/synonymous rate ratio', 'rate at which 2 nucleotides are changed instantly within a single codon', 'rate at which 3 nucleotides are changed instantly within a single codon', 'MG94 with double instantaneous substitutions - AIC-c', 'MG94 with double instantaneous substitutions - Log Likelihood', 'Substitution rate from nucleotide A to nucleotide C', 'Substitution rate from nucleotide A to nucleotide G', 'Substitution rate from nucleotide A to nucleotide T', 'Substitution rate from nucleotide C to nucleotide G', 'Substitution rate from nucleotide C to nucleotide T', 'Substitution rate from nucleotide G to nucleotide T', 'non-synonymous/synonymous rate ratio', 'rate at which 2 nucleotides are changed instantly within a single codon', 'Standard MG94 - AIC-c', 'Standard MG94 - Log Likelihood', 'Substitution rate from nucleotide A to nucleotide C', 'Substitution rate from nucleotide A to nucleotide G', 'Substitution rate from nucleotide A to nucleotide T', 'Substitution rate from nucleotide C to nucleotide G', 'Substitution rate from nucleotide C to nucleotide T', 'Substitution rate from nucleotide G to nucleotide T', 'non-synonymous/synonymous rate ratio']
 #n = 500 #has to be a way to calc this
 
@@ -162,7 +162,11 @@ def plotly_boxplot(numbers, filename, desc1, desc2, desc3): #Single boxplot
 with open(fname) as f:
     count = 0
     numlines = 0
-    SIG_TH = 0 #Number of files with triple hit rate > 1.0 and Significant (p<0.05) Proportion Triple-hit vs double-hit (%) or Significant (p<0.05) Proportion Triple-hit vs single-hit (%)
+    SIG_THvsDH = 0 #Number of files with triple hit rate > 1.0 and Significant (p<0.05) Proportion Triple-hit vs double-hit (%)
+    SIG_THvsSH = 0 #Number of files with triple hit rate > 1.0 and Significant (p<0.05) Proportion Triple-hit vs single-hit (%)
+    SIG_THvsDHorTHvsSH = 0
+    SIG_DHvsSH = 0
+    
     #line = f.readline()
     while True:
         line = f.readline().strip()
@@ -171,24 +175,26 @@ with open(fname) as f:
     
         #print(line)
         numlines += 1
-        data = line.split(",")
+        data = line.split(",") #header
+        
         
         if count == 0:
             #print("here", count)
             count += 1
-            for i, item in enumerate(data):
+            for i, item in enumerate(data): #Works for Headers
                 #print(i, item)
                 #if item == "MG94 with double and triple instantaneous substitutions - AIC-c": print(i, item)
                 #if item == "MG94 with double instantaneous substitutions - AIC-c": print(i, item)
                 #if item == "Standard MG94 - AIC-c": print(i, item)
                 pass
             continue
+        
         """
         if count == 1: #this is what the data line looks like downstream
             for i, item in enumerate(data):
                 print(i, item)
             count += 1
-        """  
+        """
         #start measuring the data
         num_seqs.append(int(data[1]))
         num_sites.append(int(data[2]))
@@ -199,23 +205,35 @@ with open(fname) as f:
             #print(float(data[19]), data[0])
             Genename_TripleH.append([float(data[19]), data[0]]) # <- ADD THIS FUNCTIONALITY TO THE CSV PARSER. WHICH GENES with rates above 1.0, names, space demilited and values space delmiited
         
-        if float(data[19]) > 1.0:
+        #if float(data[19]) > 1.0:
             #print(float(data[6]), float(data[8]))
-            if float(data[6]) < 0.05:
-            #if float(data[6]) < 0.05 or float(data[8]) < 0.5:
+            if float(data[6]) < 0.05: #Triple-hit vs double-hit
                 #print(float(data[6]), float(data[8]))
-                SIG_TH += 1
-                print(data[0]+".FITTER.json")
+                SIG_THvsDH += 1
+                print(data[0]+".FITTER.json", data[1], data[2])
+                
+            if float(data[8]) < 0.05: #Triple-hit vs single-hit
+                SIG_THvsSH += 1
+                
+            if float(data[6]) < 0.05 or float(data[8]) < 0.5:
+                SIG_THvsDHorTHvsSH +=1
+                
+            if float(data[4]) < 0.05: #Double-hit vs single-hit - p-value
+                SIG_DHvsSH += 1
+                
+                
             
         #Significant non-zero Triple Hits
         #if float(data[19]) > 0.0:
            #data[6] =  "Triple-hit vs double-hit"
            #data[8] = Triple-hit vs single-hit"
-        if float(data[6]) < 0.05: significant_TripleH[0] += 1 #counts
+        if float(data[6]) < 0.005: significant_LRTpvalue[0] += 1 #counts 
            #print(data[8])
-        if float(data[8]) < 0.05: significant_TripleH[1] += 1 #counts
+        if float(data[8]) < 0.005: significant_LRTpvalue[1] += 1 #counts
             #print("SIG",data[8])
+        if float(data[4]) < 0.005: significant_LRTpvalue[2] += 1 #counts
             
+        
         #AICc
         AICc[0].append(float(data[9])) #MG94 with double and triple instantaneous substitutions - AIC-c
         AICc[1].append(float(data[31])) #MG94 with double instantaneous substitutions - AIC-c
@@ -223,8 +241,8 @@ with open(fname) as f:
         
         #AICc Differences between them.
         diff_AICc[0].append(float(data[52]) - float(data[31])) #Difference AICc 1H vs 2H
-        diff_AICc[1].append(float(data[52]) - float(data[9]))#Difference AICc 1H vs 3H
-        diff_AICc[2].append(float(data[31]) - float(data[9]))#Difference AICc 2H vs 3H
+        diff_AICc[1].append(float(data[52]) - float(data[9])) #Difference AICc 1H vs 3H
+        diff_AICc[2].append(float(data[31]) - float(data[9])) #Difference AICc 2H vs 3H
     
         
         #log(L)
@@ -303,12 +321,19 @@ print()
 #print(sorted(TripleH_rates))
 
 print("Number of files with triple hit rate > 1.0:", len(Genename_TripleH)) #NOW HAVE TO GO INTO EACH FILE AND PICK THE GENE NAMES WITH rates above 1 <- do in CSV creator.
-print("^ and are signficant (p<0.05) TH over DH:", SIG_TH, "\n")
+print("^ and are signficant (p<0.05) Triple-hit vs double-hit:", SIG_THvsDH)
+print("^ and are signficant (p<0.05) Triple-hit vs single-hit:", SIG_THvsSH)
+print("^ and are signficant (p<0.05) Triple-hit vs double-hit or Triple-hit vs single-hit:", SIG_THvsDHorTHvsSH, "\n")
 
 #For what proportion of these rates was there a significant p-value for non-zero triple hits?
 #if "rate at which 3 nucleotides are changed instantly within a single codon" > 0.0 then
 #if "Triple-hit vs double-hit" or Triple-hit vs single-hit", p value < 0.05, count it and indicate which
-print(significant_TripleH, "Number of files: " + str(n), "\n", "Significant (p<0.05) Proportion Triple-hit vs double-hit (%):", (significant_TripleH[0]/n)*100, "\n", "Significant (p<0.05) Proportion Triple-hit vs single-hit (%):", (significant_TripleH[1]/n)*100)
+print(significant_TripleH, "Number of files: " + str(n), "\n", 
+      "Significant (p<0.005) Proportion Triple-hit vs double-hit (%):", (significant_LRTpvalue[0]/n)*100, "\n", 
+      "Significant (p<0.005) Proportion Triple-hit vs single-hit (%):", (significant_LRTpvalue[1]/n)*100, "\n",
+      "Significant (p<0.005) Proportion Double-hit vs single-hit (%):", (significant_LRTpvalue[2]/n)*100)
+
+
 print()
 print("() Sites and sequences Summary Stats")
 print("Average number of sequences:", sum(num_seqs)/ len(num_seqs))
