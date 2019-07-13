@@ -32,3 +32,7 @@ directoryscanner.py
 NEXUS_Datatype_P_DNA.py
 -ammends/corrects some mislabelling of Selectome datasets
 -DNA sequences labelled as Protein
+
+plot_pvalue_vs_seqlength.py 
+-a modificiation of the plot_csv.py
+-used to created pvalue versus sequence length scatterplots.
