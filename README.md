@@ -28,6 +28,11 @@
 
 ### directoryscanner.py
      -used for submitting jobs to cluster, outdated
+     
+### filescanner.py
+     -a modification of directoryscanner.py
+     -takes a text file as input, which contains a list of filenames to run analysis on
+     -used for submitting jobs to cluster ONLY on these filenames
 
 ### NEXUS_Datatype_P_DNA.py
     -ammends/corrects some mislabelling of Selectome datasets
