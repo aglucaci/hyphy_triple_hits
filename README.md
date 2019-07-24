@@ -2,6 +2,7 @@
 
 ### parse_fitter_json.py: 
 > -take fitter jsons produced by FitMultiModel.bf and processes them to csv for downstream analysis. 
+
 > -Is there a better way to do this?
 
 ### plot_csv.py
