@@ -34,5 +34,5 @@ NEXUS_Datatype_P_DNA.py
 -DNA sequences labelled as Protein
 
 plot_pvalue_vs_seqlength.py 
--a modificiation of the plot_csv.py <p>
+-a modificiation of the plot_csv.py <br>
 -used to created pvalue versus sequence length scatterplots.
