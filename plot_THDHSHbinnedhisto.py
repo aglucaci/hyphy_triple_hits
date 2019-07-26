@@ -32,6 +32,8 @@ import json
 import numpy as np
 import plotly
 import plotly.graph_objs as go
+import math
+from prettytable import PrettyTable
 
 # =============================================================================
 # Declares
@@ -42,7 +44,7 @@ SELECTOME = r"E:\SELECTOME_TRIP_AMMENDED_SRV\SELECTOME_TRIP_AMMENDED_SRV_FITTER_
 files = [f for r, d, f in os.walk(SELECTOME)]
 existing = [os.path.join(SELECTOME, file) for file in files[0]]
 #name, ext = os.path.splitext(each_file)
-THRESHOLD_TH_VALUE = 3
+THRESHOLD_TH_VALUE = 10
 
 # =============================================================================
 # Helper functions
@@ -141,16 +143,21 @@ look for all TH changes
 and ask how many fall within a binsize window of each other
 """
 
-def bar_chart(x, y, title, output, filenames):
+def scatter_3d(x, y, title, output, filenames):
     #https://plot.ly/python/bar-charts/
     #import plotly.express as px
+    #color based on bin size
+    #5 bins
+    
+    A =  x
     
     data = [go.Scatter3d(
             x=x,
             y=y,
             z=[f.split("| ")[1] for f in filenames],
             text=filenames,
-            mode='markers'
+            mode='markers',
+            marker=dict(size=12, color=A, colorscale='Viridis', opacity=0.8, line=dict(color="black", width=0.75))
     )]
     
     #data = [go.Bar(
@@ -183,15 +190,19 @@ def bar_chart(x, y, title, output, filenames):
     plotly.offline.plot(fig, filename=output)
 
 
-def bar_chart_original(x, y, title, output, filenames):
+def scatter_2d(x, y, title, output, filenames):
     #https://plot.ly/python/bar-charts/
+    #Bubble size based on number of occurences of y
+    
+    #number of occurences of 1 in y
+    
     
     data = [go.Scatter(
             x=x,
             y=y,
             mode = 'markers',
             text=filenames,
-            marker=dict(size=16, line=dict(color="black", width=1))
+            marker=dict(size=[5*math.log10(y.count(value)) for value in y], color=x, colorscale='Viridis', opacity=0.8, line=dict(color="black", width=0.75))
     )]
     
     #data = [go.Bar(
@@ -273,7 +284,7 @@ for n, item in enumerate(existing):
                     site_window15 = sites_within_a_bin(site_info, site_subs, 15)
                     site_window2 = sites_within_a_bin(site_info, site_subs, 2)
                     
-                    print("Plot this:", os.path.basename(item), site_window10)
+                    #print("Plot this:", os.path.basename(item), site_window10)
                     #bar_chart()
                     for key in site_window10.keys(): 
                         site10_window_y.append(site_window10[key])
@@ -298,7 +309,7 @@ for n, item in enumerate(existing):
                 else:
                     print(" Nothing to do, continue")
                 
-    #if cnt_passed == 20: break
+    if cnt_passed == 200: break
 
 
 # =============================================================================
@@ -330,14 +341,51 @@ x = [10] * len(site10_window_y) + [5] * len(site5_window_y) + [20] * len(site20_
 y = site10_window_y + site5_window_y + site20_window_y + site15_window_y + site2_window_y
 filenames = site10_window_filenames + site5_window_filenames + site20_window_filenames + site15_window_filenames + site2_window_filenames
 
+#maybe do 5, 10 ,20 for 3d scatter
+#bar_chart(x, y, "SPATIAL CLUSTERING OF TH Changes", "test_scatter3d_thsiteanalysis_binned.html", filenames)
+scatter_2d(x, y, "SPATIAL CLUSTERING OF TH Changes", "test_scatter_thsiteanalysis_binned.html", filenames)
 
-bar_chart(x, y, "TEST TITLE", "test_scatter_thsiteanalysis_binned.html", filenames)
+
+table = PrettyTable()
+
+table.field_names = ["Filename", "Site", "binsize = 2 sites", "5", "10", "15", "20"]
+
+
+for n in range(len(site5_window_y)):
+    #row = []
+    #row = site5_window_filenames
+    filename = site5_window_filenames[n].split(" | ")[1]
+    site = site5_window_filenames[n].split(" | ")[0].replace("Site:", "")
+    table.add_row([filename, site, site2_window_y[n], site5_window_y[n], site10_window_y[n], site15_window_y[n], site20_window_y[n]])
+    
+    
+    #table.add_row([site5_window_filenames[i], ])
+print(x)
+
 
 """
-Each dot represents, a specific site within an alignment
-which is surrounded by X number of triple hit changes within a Y (number of sites) window
+x.add_row(["Adelaide", 1295, 1158259, 600.5])
+x.add_row(["Brisbane", 5905, 1857594, 1146.4])
+x.add_row(["Darwin", 112, 120900, 1714.7])
+x.add_row(["Hobart", 1357, 205556, 619.5])
+x.add_row(["Sydney", 2058, 4336374, 1214.8])
+x.add_row(["Melbourne", 1566, 3806092, 646.9])
+x.add_row(["Perth", 5386, 1554769, 869.4])
+"""
 
-Sites may have more changes than the Y sized window because each individual site can have more than 1 TH change.
+
+
+x = [10] * len(site10_window_y) + [5] * len(site5_window_y) + [20] * len(site20_window_y)
+y = site10_window_y + site5_window_y + site20_window_y 
+filenames = site10_window_filenames + site5_window_filenames + site20_window_filenames
+scatter_3d(x, y, "SPATIAL CLUSTERING OF TH Changes", "test_scatter3d_thsiteanalysis_binned.html", filenames)
+
+"""
+Each dot represents, a specific site within an alignment which passed the p-value threshold 0.005 (THvsDH LRT) and sites with an evidence ratio 3x above the mean.
+Which is surrounded by X number of triple hit changes within a Y (number of sites) window.
+
+Sites may have more changes than the Y (2, 5, 10, 15 , 20) sized window because each individual site can have more than 1 TH change.
+These stand out as sites of rapid change and may warrant further investigation.
 """
 # =============================================================================
 # Summary
@@ -348,7 +396,7 @@ print("### Summary ###")
 print("total number of files processed:", total_files)
 print("number of files which passed p-value threshold:", cnt_passed)
 print( "Number of sites, binsize 10:", len(site10_window_y))
-print(site10_window_y)
+#print(site10_window_y)
 print( "Number of sites, binsize 5:",len(site5_window_y))
 print( "Number of sites, binsize 20:",len(site20_window_y))
 print( "Number of sites, binsize 15:",len(site15_window_y))
