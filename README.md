@@ -41,3 +41,11 @@
 ### plot_pvalue_vs_seqlength.py 
     -a modificiation of the plot_csv.py
     -used to created pvalue versus sequence length scatterplots.
+    
+    
+### convert_nexus_to_fasta.py
+    -part of testing realignment
+    -takes input as a nexus file
+    -can output aligned or unaligned fasta files.
+    
+    
