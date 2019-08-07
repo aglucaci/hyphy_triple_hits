@@ -9,6 +9,7 @@ library("AlignStat")
 
 ## DECLARES
 setwd("~/Documents/TRIPLE_HITS/Realignment_testing/AlignStat")
+start_time <- Sys.time()
 
 REF_PATH = "../selectome_aligned_fasta"
 COMP_PATH = "../mafft_changed_filenames"
@@ -58,6 +59,9 @@ for (file in files) {
   if (!file.exists(output_filename)){
     run_alignstat(ref, comp, output_filename)
   }
+  
+  end_time <- Sys.time()
+  print(paste("RUN TIME (s):", end_time - start_time))
 }
 
 
