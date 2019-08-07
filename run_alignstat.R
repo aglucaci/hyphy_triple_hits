@@ -45,14 +45,22 @@ files <- list.files(path=REF_PATH, pattern="*.fasta", full.names=TRUE, recursive
 #paste(COMP_PATH, basename(files[1]), sep="/")
 print("ENTERING FOR LOOP..")
 for (file in files) {
-  print("starting analysis for:")
-  print(ref)
+  print(paste("starting analysis for:", file))
   ref = file
   comp = paste(COMP_PATH, basename(ref), sep="/")
+  print(paste("comparison file:", comp))
   output_filename = paste(OUTPUT_PATH, paste(basename(ref), ".out", sep=""), sep="/")
-  run_alignstat(ref, comp, output_filename)
+  #CHECK IF OUTPUT_FILENAME EXISTS, continue
+  if (file.exists(output_filename)){
+    print(paste("CACHED", output_filename))
+  }
+  
+  if (!file.exists(output_filename)){
+    run_alignstat(ref, comp, output_filename)
+  }
 }
 
 
 ## END OF FILE
 #https://stackoverflow.com/questions/14958516/looping-through-all-files-in-directory-in-r-applying-multiple-commands
+#https://stackoverflow.com/questions/14904983/how-do-i-check-the-existence-of-a-local-file
