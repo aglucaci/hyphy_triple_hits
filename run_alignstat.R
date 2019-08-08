@@ -45,7 +45,10 @@ files <- list.files(path=REF_PATH, pattern="*.fasta", full.names=TRUE, recursive
 
 #paste(COMP_PATH, basename(files[1]), sep="/")
 print("ENTERING FOR LOOP..")
+count = 0
+
 for (file in files) {
+  print(paste(count, length(files),sep="/"))
   print(paste("starting analysis for:", file))
   ref = file
   comp = paste(COMP_PATH, basename(ref), sep="/")
@@ -61,7 +64,8 @@ for (file in files) {
   }
   
   end_time <- Sys.time()
-  print(paste("RUN TIME (s):", end_time - start_time))
+  print(paste("RUN TIME:", end_time - start_time))
+  count = count + 1 
 }
 
 
