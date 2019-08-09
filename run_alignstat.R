@@ -2,7 +2,8 @@
 #2019
 #Run Alignstat on realigned and reference selectome alignments
 #Alexander Lucaci
-
+#command line cmd: /Library/Frameworks/R.framework/Versions/3.3/Resources/Rscript run_alignstat.R 
+#wd: /Users/alex/Documents/TRIPLE_HITS/Realignment_testing/AlignStat/R
 
 ## IMPORTS
 library("AlignStat")
@@ -17,6 +18,9 @@ OUTPUT_PATH = "results"
 
 ## HELPER FUNCTIONS
 run_alignstat = function(ref, comp, output_filename){
+  print("Creating empty output file")
+  file.create(output_filename)
+  
   print("COMPARING ALIGNMENTS..")
   PAC = compare_alignments  (ref, comp, CS=TRUE, SP=TRUE)
   
@@ -48,8 +52,8 @@ print("ENTERING FOR LOOP..")
 count = 0
 
 for (file in files) {
-  print(paste(count, length(files),sep="/"))
-  print(paste("starting analysis for:", file))
+  print(paste(count, length(files),sep="/"), quote = FALSE)
+  print(paste("reference file:", file))
   ref = file
   comp = paste(COMP_PATH, basename(ref), sep="/")
   print(paste("comparison file:", comp))
@@ -57,6 +61,7 @@ for (file in files) {
   #CHECK IF OUTPUT_FILENAME EXISTS, continue
   if (file.exists(output_filename)){
     print(paste("CACHED", output_filename))
+    #CONTINUE
   }
   
   if (!file.exists(output_filename)){
