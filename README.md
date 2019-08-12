@@ -1,4 +1,5 @@
-# hyphy_triple_hits
+# HyPhy (multinucleotide replacement model)
+    -Modification of base MG94
 
 ### parse_fitter_json.py: 
     -take fitter jsons produced by FitMultiModel.bf and processes them to csv for downstream analysis.  
