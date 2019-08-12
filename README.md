@@ -48,4 +48,6 @@
     -takes input as a nexus file
     -can output aligned or unaligned fasta files.
     
+### run_alignstat.R
+    -used to run alignstat (generates quality scores for alignments)
     
