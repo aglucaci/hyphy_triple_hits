@@ -17,11 +17,11 @@ echo ""
 # USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING
 BASEDIRECTORY="/Users/alex/Documents/TRIPLE_HITS"
 
-#FITTERS="/Users/alex/Documents/TRIPLE_HITS/SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
-FITTERS="/Users/alex/Documents/TRIPLE_HITS/PETROV/bestrecip_prank_alignments_FITTERS"
-CSVFILE="PETROV_SRV.csv"
-CIRCOSTEXTFILE="CIRCOS_PETROV_SRV.txt"
-OUTPUT_FOLDER="../analysis/PETROV"
+FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Vertebrate_mtDNA_FITTERS"
+FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/mtDNA_noS2S/updatedAnalysis_mtDNA_combined_FITTERS"
+CSVFILE="mtDNA_noS2S_Vertebrate_SRV.csv"
+CIRCOSTEXTFILE="mtDNA_noS2S_Vertebrate_SRV.txt"
+OUTPUT_FOLDER="../analysis/mtDNA_noS2S/Vertebrate"
 
 # ^^^^^^ USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING ^^^^^^^^
 
@@ -35,12 +35,7 @@ OUTPUT_FOLDER="../analysis/PETROV"
 echo "(1) Running: pipeline_circos_grab_site_substitution_data.py"
 echo "    Saving to: "$OUTPUT_FOLDER/$CIRCOSTEXTFILE
 
-#[[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE ]] || echo "It does exist?"
-#[[ ! -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE ]] || echo "It does exist?"
-#[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE ] || echo "It does exist? deux"
-
 [[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE ]] || python pipeline_circos_grab_site_substitution_data.py $FITTERS $OUTPUT_FOLDER/$CIRCOSTEXTFILE > $OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data.txt
-#python pipeline_circos_grab_site_substitution_data.py $FITTERS $OUTPUT_FOLDER/$CIRCOSTEXTFILE
 
 # ==============================================================================
 # pipeline_parse_fitter_json.py <FITTERS DIRECTORY> <OUTPUTCSV>
@@ -59,7 +54,7 @@ echo ""
 echo "(3) Running: pipeline_plot_csv.py"
 echo "    Saving to: "$OUTPUT_FOLDER/Plots
 
-[ -d $OUTPUT_FOLDER/Plots ] || python pipeline_plot_csv.py $OUTPUT_FOLDER/$CSVFILE $OUTPUT_FOLDER/Plots/ > $OUTPUT_FOLDER/pipeline_plot_csv.txt
+[ -e $OUTPUT_FOLDER/pipeline_plot_csv.txt ] || python pipeline_plot_csv.py $OUTPUT_FOLDER/$CSVFILE $OUTPUT_FOLDER/Plots/ > $OUTPUT_FOLDER/pipeline_plot_csv.txt
 
 # ==============================================================================
 # pipeline_pvalue_vs_seqlength.py <INPUTCSV>
@@ -77,7 +72,7 @@ echo "    Saving to: "$OUTPUT_FOLDER/Plots/pvalue_vs_seqlength
 echo ""
 echo "(5) Running: pipeline_plot_2LogEvidenceRatio.py"
 echo "    This creates the 2*Ln*Evidence ratio plots"
-python pipeline_plot_2LogEvidenceRatio.py $FITTERS $OUTPUT_FOLDER/Plots/EvidenceRatioPlots
+[ -d $OUTPUT_FOLDER/Plots/EvidenceRatioPlots ] || python pipeline_plot_2LogEvidenceRatio.py $FITTERS $OUTPUT_FOLDER/Plots/EvidenceRatioPlots
 
 # ==============================================================================
 # pipeline_spatial_analysis_THDHSH.py <FITTERDIR> <OUTPUT_DIR>
@@ -85,11 +80,14 @@ python pipeline_plot_2LogEvidenceRatio.py $FITTERS $OUTPUT_FOLDER/Plots/Evidence
 echo ""
 echo "(6) Running: pipeline_spatial_analysis_THDHSH.py"
 echo "    Saving to: "$OUTPUT_FOLDER/Plots/spatial_analysis
-python pipeline_spatial_analysis_THDHSH.py $FITTERS $OUTPUT_FOLDER/Plots/spatial_analysis
+[ -d $OUTPUT_FOLDER/Plots/spatial_analysis ] || python pipeline_spatial_analysis_THDHSH.py $FITTERS $OUTPUT_FOLDER/Plots/spatial_analysis > pipeline_spatial_analysis_THDHSH.txt
 
 # ==============================================================================
-# 
+# pipeline_plot_w_and_wo_Serines.py <FITTERS> <NOS2S_FITTERS>
 # ==============================================================================
+echo ""
+echo "(7) Running: pipeline_plot_w_and_wo_Serines.py"
+python pipeline_plot_w_and_wo_Serines.py $FITTERS $FITTERS_NOSS
 
 # ==============================================================================
 # End of pipeline
