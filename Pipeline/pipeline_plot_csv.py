@@ -79,7 +79,9 @@ def subplot_histogram(asizes, adesc, species, title, xaxislabel, filename):
     trace0 = go.Histogram(x=asizes[0], text=adesc[0], name=species[0])
     trace1 = go.Histogram(x=asizes[1], text=adesc[1], name=species[1])
     trace2 = go.Histogram(x=asizes[2], text=adesc[2], name=species[2])
-    fig = tools.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
+    
+    #fig = tools.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
+    fig = plotly.subplots.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
     #xaxis, yaxis
     fig.append_trace(trace0, 1, 1)
     fig.append_trace(trace1, 2, 1)
@@ -97,7 +99,10 @@ def subplot_histogram_morebins(asizes, adesc, species, title, xaxislabel, filena
     trace0 = go.Histogram(x=asizes[0], text=adesc[0], name=species[0], nbinsx = 100) #
     trace1 = go.Histogram(x=asizes[1], text=adesc[1], name=species[1], nbinsx = 100) #
     trace2 = go.Histogram(x=asizes[2], text=adesc[2], name=species[2], nbinsx = 100) #
-    fig = tools.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
+    
+    #fig = tools.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
+    fig = plotly.subplots.make_subplots(rows=3, cols=1, subplot_titles=(species[0], species[1],species[2]))
+    
     #xaxis, yaxis
     fig.append_trace(trace0, 1, 1)
     fig.append_trace(trace1, 2, 1)

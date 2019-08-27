@@ -17,17 +17,17 @@ echo ""
 # USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING
 BASEDIRECTORY="/Users/alex/Documents/TRIPLE_HITS"
 
-#FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Vertebrate_mtDNA_FITTERS"
-#FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/mtDNA_noS2S/updatedAnalysis_mtDNA_combined_FITTERS"
-#CSVFILE="mtDNA_noS2S_Vertebrate_SRV.csv"
-#CIRCOSTEXTFILE="mtDNA_noS2S_Vertebrate_SRV.txt"
-#OUTPUT_FOLDER="../analysis/mtDNA_noS2S/Vertebrate"
-
-FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Invertebrate_mtDNA_FITTERS"
+FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Vertebrate_mtDNA_FITTERS"
 FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/mtDNA_noS2S/updatedAnalysis_mtDNA_combined_FITTERS"
-CSVFILE="mtDNA_noS2S_Invertebrate_SRV.csv"
-CIRCOSTEXTFILE="mtDNA_noS2S_Invertebrate_SRV.txt"
-OUTPUT_FOLDER="../analysis/mtDNA_noS2S/Invertebrate"
+CSVFILE="mtDNA_noS2S_Vertebrate_SRV.csv"
+CIRCOSTEXTFILE="mtDNA_noS2S_Vertebrate_SRV.txt"
+OUTPUT_FOLDER="../analysis/mtDNA_noS2S/Vertebrate"
+
+#FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Invertebrate_mtDNA_FITTERS"
+#FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/mtDNA_noS2S/updatedAnalysis_mtDNA_combined_FITTERS"
+#CSVFILE="mtDNA_noS2S_Invertebrate_SRV.csv"
+#CIRCOSTEXTFILE="mtDNA_noS2S_Invertebrate_SRV.txt"
+#OUTPUT_FOLDER="../analysis/mtDNA_noS2S/Invertebrate"
 
 
 # ^^^^^^ USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING ^^^^^^^^
@@ -79,7 +79,7 @@ echo "    Saving to: "$OUTPUT_FOLDER/Plots/pvalue_vs_seqlength
 echo ""
 echo "(5) Running: pipeline_plot_2LogEvidenceRatio.py"
 echo "    This creates the 2*Ln*Evidence ratio plots"
-[ -d $OUTPUT_FOLDER/Plots/EvidenceRatioPlots ] || python pipeline_plot_2LogEvidenceRatio.py $FITTERS $OUTPUT_FOLDER/Plots/EvidenceRatioPlots
+[ -d $OUTPUT_FOLDER/Plots/EvidenceRatioPlots ] || python pipeline_plot_2LogEvidenceRatio.py $FITTERS $OUTPUT_FOLDER/Plots/EvidenceRatioPlots > $OUTPUT_FOLDER/pipeline_plot_2LogEvidenceRatio.txt
 
 # ==============================================================================
 # pipeline_spatial_analysis_THDHSH.py <FITTERDIR> <OUTPUT_DIR>
@@ -94,8 +94,10 @@ echo "    Saving to: "$OUTPUT_FOLDER/Plots/spatial_analysis
 # ==============================================================================
 echo ""
 echo "(7) Running: pipeline_plot_w_and_wo_Serines.py"
-python pipeline_plot_w_and_wo_Serines.py $FITTERS $FITTERS_NOSS $OUTPUT_FOLDER/Plots/ > $OUTPUT_FOLDER/pipeline_plot_w_and_wo_Serines.txt
+[ -e $OUTPUT_FOLDER/pipeline_plot_w_and_wo_Serines.txt ] || python pipeline_plot_w_and_wo_Serines.py $FITTERS $FITTERS_NOSS $OUTPUT_FOLDER/Plots/ > $OUTPUT_FOLDER/pipeline_plot_w_and_wo_Serines.txt
 
+echo ""
+echo " () Done"
 # ==============================================================================
 # End of pipeline
 # ==============================================================================
