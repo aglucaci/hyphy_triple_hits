@@ -17,11 +17,18 @@ echo ""
 # USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING
 BASEDIRECTORY="/Users/alex/Documents/TRIPLE_HITS"
 
-FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Vertebrate_mtDNA_FITTERS"
+#FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Vertebrate_mtDNA_FITTERS"
+#FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/mtDNA_noS2S/updatedAnalysis_mtDNA_combined_FITTERS"
+#CSVFILE="mtDNA_noS2S_Vertebrate_SRV.csv"
+#CIRCOSTEXTFILE="mtDNA_noS2S_Vertebrate_SRV.txt"
+#OUTPUT_FOLDER="../analysis/mtDNA_noS2S/Vertebrate"
+
+FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Invertebrate_mtDNA_FITTERS"
 FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/mtDNA_noS2S/updatedAnalysis_mtDNA_combined_FITTERS"
-CSVFILE="mtDNA_noS2S_Vertebrate_SRV.csv"
-CIRCOSTEXTFILE="mtDNA_noS2S_Vertebrate_SRV.txt"
-OUTPUT_FOLDER="../analysis/mtDNA_noS2S/Vertebrate"
+CSVFILE="mtDNA_noS2S_Invertebrate_SRV.csv"
+CIRCOSTEXTFILE="mtDNA_noS2S_Invertebrate_SRV.txt"
+OUTPUT_FOLDER="../analysis/mtDNA_noS2S/Invertebrate"
+
 
 # ^^^^^^ USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING ^^^^^^^^
 
@@ -48,7 +55,7 @@ echo "    Saving to: "$OUTPUT_FOLDER/$CSVFILE
 
 
 # ==============================================================================
-# pipeline_plot_csv.py <INPUTCSV>
+# pipeline_plot_csv.py <INPUTCSV> <OUTPUT DIR>
 # ==============================================================================
 echo ""
 echo "(3) Running: pipeline_plot_csv.py"
@@ -80,14 +87,14 @@ echo "    This creates the 2*Ln*Evidence ratio plots"
 echo ""
 echo "(6) Running: pipeline_spatial_analysis_THDHSH.py"
 echo "    Saving to: "$OUTPUT_FOLDER/Plots/spatial_analysis
-[ -d $OUTPUT_FOLDER/Plots/spatial_analysis ] || python pipeline_spatial_analysis_THDHSH.py $FITTERS $OUTPUT_FOLDER/Plots/spatial_analysis > pipeline_spatial_analysis_THDHSH.txt
+[ -d $OUTPUT_FOLDER/Plots/spatial_analysis ] || python pipeline_spatial_analysis_THDHSH.py $FITTERS $OUTPUT_FOLDER/Plots/spatial_analysis/ > $OUTPUT_FOLDER/pipeline_spatial_analysis_THDHSH.txt
 
 # ==============================================================================
-# pipeline_plot_w_and_wo_Serines.py <FITTERS> <NOS2S_FITTERS>
+# pipeline_plot_w_and_wo_Serines.py <FITTERS> <NOS2S_FITTERS> <Output_Dir>
 # ==============================================================================
 echo ""
 echo "(7) Running: pipeline_plot_w_and_wo_Serines.py"
-python pipeline_plot_w_and_wo_Serines.py $FITTERS $FITTERS_NOSS
+python pipeline_plot_w_and_wo_Serines.py $FITTERS $FITTERS_NOSS $OUTPUT_FOLDER/Plots/ > $OUTPUT_FOLDER/pipeline_plot_w_and_wo_Serines.txt
 
 # ==============================================================================
 # End of pipeline

@@ -35,6 +35,8 @@ wo_serine_fitters = sys.argv[2]
 #Look for this ending.
 file_ending = ".FITTER.json"
 
+output_directory = sys.argv[3]
+
 #This needs to be generated.
 filenames_by_class = ["allfiles.txt", "p0-05.txt", "p0-005.txt", "p0-005_Threshold_3x_.txt", "p0-005_Threshold_10x_.txt"]
 
@@ -77,11 +79,14 @@ def main(files):
     plot_data_holder = {}                 
     filecount = 0
     numnegatives = 0
+    num_zerochange = 0
     
-    for i, file in enumerate(files):
+    for i, file in enumerate(files): #WO SERINES
         #print("Loading:", i, file)
+        #print("Reading:", file)
         file_a = read_json_returnTHrate(file) # without serines
         #print(os.path.join(fitters, file.split("\\")[-1]))
+        
         try:
             file_b = read_json_returnTHrate(os.path.join(fitters, file.split("/")[-1])) #original
         except:
@@ -92,8 +97,12 @@ def main(files):
         #print("Trying diff")
         try:
             #print("in diff")
-            plot_data_holder[file.split("/")[-1]] = diff(file_b,file_a) 
+            plot_data_holder[file.split("/")[-1]] = diff(file_b, file_a)  #ORIGINAL - WO_SERINE
+            #IF NEGATIVE, WO_SERINE RATE IS HIGHER THAN ORIGINAL
+            #IF POSITIVE, ORIGINAL IS HIGHER THAN WO_SERINE
             if diff(file_b,file_a) < 0: numnegatives += 1
+            #print(diff(file_b,file_a))
+            if diff(file_b,file_a) == 0.0: num_zerochange += 1
             filecount += 1
         except:
             continue
@@ -102,15 +111,17 @@ def main(files):
 
 
     """ Plotting """
-    print("Plotting pairs:", len(plot_data_holder))
+    print("\t() Plotting pairs:", len(plot_data_holder), "files")
+    print("\t", "Number of Negative values (WO_SERINE RATE IS HIGHER THAN ORIGINAL):", numnegatives, (numnegatives/len(plot_data_holder))*100)
+    print("\t", "Number of No change values:", num_zerochange, (num_zerochange/len(plot_data_holder))*100)
     
     x, y = [], []
     for key in plot_data_holder.keys():
          x.append(key)
          y.append(plot_data_holder[key])
-    print(numnegatives, str((numnegatives/filecount)*100) + "%")
+    #print("\t", numnegatives, str((numnegatives/filecount)*100) + "%")
     asapercent = round((numnegatives/filecount)*100, 2)
-    print(asapercent)
+    #print("\t", asapercent)
     title = "TH Rate differences (with and without Serines) Total cases: " + str(filecount) +  " Num neg. cases: " + str(numnegatives) + " (" + str(asapercent) + "%)"
     plot(x, y, title, output_filename)
     
@@ -118,7 +129,7 @@ def main(files):
 # Main
 # =============================================================================
 by_file_class = False
-print("() Init")
+print("\t() Init")
 
 """ The setup. """
 
@@ -129,7 +140,8 @@ if by_file_class == False:
     #files = [path+"\\"+f.name for f in os.scandir(path) if f.name.endswith(file_ending)]
     files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith(file_ending)]
     #print(", ".join(["#", "Filename", "Original TH rate", "W/O Serine TH Rate", "Difference (Original-W/O)"]))
-    output_filename = "W_AND_WO_SERINES.html"
+    output_filename = output_directory + "W_AND_WO_SERINES.html"
+    print("\t() Saving to:", output_filename)
     main(files)  
     
 

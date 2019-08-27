@@ -356,7 +356,7 @@ filenames = site10_window_filenames + site5_window_filenames + site20_window_fil
 
 #maybe do 5, 10 ,20 for 3d scatter
 #bar_chart(x, y, "SPATIAL CLUSTERING OF TH Changes", "test_scatter3d_thsiteanalysis_binned.html", filenames)
-scatter_2d(x, y, "SPATIAL CLUSTERING OF TH Changes", "test_scatter_thsiteanalysis_binned.html", filenames)
+scatter_2d(x, y, "SPATIAL CLUSTERING OF TH Changes", output_dir+"test_scatter2d_thsiteanalysis_binned.html", filenames)
 
 """
 table = PrettyTable()
@@ -391,7 +391,7 @@ x.add_row(["Perth", 5386, 1554769, 869.4])
 x = [10] * len(site10_window_y) + [5] * len(site5_window_y) + [20] * len(site20_window_y)
 y = site10_window_y + site5_window_y + site20_window_y 
 filenames = site10_window_filenames + site5_window_filenames + site20_window_filenames
-scatter_3d(x, y, "SPATIAL CLUSTERING OF TH Changes", "test_scatter3d_thsiteanalysis_binned.html", filenames)
+scatter_3d(x, y, "SPATIAL CLUSTERING OF TH Changes", output_dir+"test_scatter3d_thsiteanalysis_binned.html", filenames)
 
 """
 Each dot represents, a specific site within an alignment which passed the p-value threshold 0.005 (THvsDH LRT) and sites with an evidence ratio 3x above the mean.
