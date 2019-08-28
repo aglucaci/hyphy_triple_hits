@@ -146,8 +146,10 @@ def plotly_boxplot(numbers, filename, desc1, desc2, desc3): #Single boxplot
 # =============================================================================
 # Main subroutine
 # =============================================================================
+print("CSV FILE:", fname)
 
-with open(fname) as f:
+
+with open(fname, "r") as f: #THE CSV FILE
     count = 0
     numlines = 0
     SIG_THvsDH = 0 #Number of files with triple hit rate > 1.0 and Significant (p<0.05) Proportion Triple-hit vs double-hit (%)

@@ -38,8 +38,8 @@ file_ending = ".FITTER.json"
 output_directory = sys.argv[3]
 
 #This needs to be generated.
-filenames_by_class = ["allfiles.txt", "p0-05.txt", "p0-005.txt", "p0-005_Threshold_3x_.txt", "p0-005_Threshold_10x_.txt"]
-
+#filenames_by_class = ["allfiles.txt", "p0-05.txt", "p0-005.txt", "p0-005_Threshold_3x_.txt", "p0-005_Threshold_10x_.txt"]
+pvalue_threshold = 0.05
 # ============================================================================
 # Helper functions
 # =============================================================================
@@ -124,16 +124,36 @@ def main(files):
     #print("\t", asapercent)
     title = "TH Rate differences (with and without Serines) Total cases: " + str(filecount) +  " Num neg. cases: " + str(numnegatives) + " (" + str(asapercent) + "%)"
     plot(x, y, title, output_filename)
+  
     
+def pass_pvalue_threshold(filename):
+    global pvalue_threshold
+    
+    
+    with open(filename, "r") as fh:
+        json_data = json.load(fh)
+    fh.close()
+    
+    file_pvalue = json_data["test results"]["Triple-hit vs double-hit"]["p-value"]
+    
+    if float(file_pvalue) < pvalue_threshold:
+        passed = True
+    else:
+        passed = False
+        
+    return passed
 # =============================================================================
 # Main
 # =============================================================================
-by_file_class = False
+#by_file_class = False
+by_file_class = sys.argv[4]
+
 print("\t() Init")
 
 """ The setup. """
 
-if by_file_class == False: 
+if by_file_class == "False": 
+    print([by_file_class])
     #plot(['2016','2017','2018'], [-500,-600,-700])
     #sys.exit(1)
     path = wo_serine_fitters
@@ -145,30 +165,26 @@ if by_file_class == False:
     main(files)  
     
 
-if by_file_class == True:
+if by_file_class == "True":
+    print([by_file_class])
     #by file class?
-    print("() Processing by file class")
-    path = sys.argv[1]
-    
-    for filename in filenames_by_class:
-        files = []
-        cnt = 0
-        #filename = filenames_by_class[0]
-        output_filename = filename.replace(".txt", ".html")
-        with open(filename) as f:
-            for n, line in enumerate(f):
-                exists = path+"/"+line.strip()+file_ending
-                if os.path.isfile(exists):
-                    #files.append(path+"/"+line.strip()+".FITTER.json")
-                    files.append(exists)
-                    cnt += 1
-            f.close()
-        #print(len(files), cnt)
-    
-        main(files)       
+    print("() Processing by file class, which means p-value threshold")
+    #path = sys.argv[1]
+    path = wo_serine_fitters
+    files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith(file_ending)]
+    filenames_by_class = [file for file in files if pass_pvalue_threshold(file) == True]
+    output_filename = output_directory + "W_AND_WO_SERINES_pvalue_threshold.html"
+    print("\t() Saving pvalue_thresholded to:", output_filename)
+    main(filenames_by_class)       
     
 
 sys.exit(3) # --- ##
+
+# =============================================================================
+# Extra code 
+# =============================================================================
+
+
 
 """ Data processing """
 plot_data_holder = {}                 
@@ -218,36 +234,3 @@ plot(x, y, title)
 # =============================================================================
 # End of file
 # =============================================================================
-"""
-Make table
-
-Model
-LogL
-omega
-2-hit rate and pvalue
-3hitrate and pvalue
-"""
-
-
-"""
-def read_json_andcsv(filename):
-    this_file = {}
-    #header = 
-    csv_columns = ['No','Name','Country']
-    with open(filename, "r") as fh:
-        json_data = json.load(fh)
-        csv_file = json_data["input"]["file name"].split("/")[-1] + ".csv"
-        with open(csv_file, 'w') as csvfile:
-            csvwriter = csv.writer(csvfile)
-            count = 0
-            csv_columns = ["fits"]
-            for n, data in enumerate(json_data.keys()):
-                if data in csv_columns:
-                    if count == 0:
-                        #csvwriter.writerow(json_data.keys())
-                        csvwriter.writerow(data)
-                        count += 1
-                    csvwriter.writerow(json_data[data])
-    fh.close()
-
-"""
