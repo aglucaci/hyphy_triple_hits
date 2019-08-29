@@ -179,15 +179,21 @@ x.add_row(["5", "[What happened in these files? From 3.]"] + ["-", "-", "-"])
 
 #x.add_row([" -> Omega went up"] + "DH(), SH()")
 
-x.add_row(["6", " -> Omega went up"] + [" ".join(str(v) for v in up_TH_omega_comparison), 
-          " ".join(str(v) for v in up_DH_omega_comparison), 
-          " ".join(str(v) for v in up_SH_omega_comparison)])
+x.add_row(["6", " -> Omega went up"] + ["(vsDH, vsSH) " + " ".join(str(v) for v in up_TH_omega_comparison), 
+          "(vsTH, vsSH) " + " ".join(str(v) for v in up_DH_omega_comparison), 
+          "(vsTH, vsDH) " + " ".join(str(v) for v in up_SH_omega_comparison)])
     
 x.add_row(["7", " -> Omega stayed the same"] + ["NA", "NA", "NA"])      
 
 x.add_row(["8", " -> Omega went down"] + [" ".join(str(v) for v in down_TH_omega_comparison), 
           " ".join(str(v) for v in down_DH_omega_comparison), 
           " ".join(str(v) for v in down_SH_omega_comparison)])                                                                                                                                                     
+
+x.add_row(["9", "TH rate > 1.0 and omega 1.0"] + ["NA", "NA", "NA"])
+
+x.add_row(["10", "DH rate > 1.0 and omega 1.0"] + ["NA", "NA", "NA"])
+x.add_row(["11" , "Number of files with p<0.05 for DHvsSH LRT"] + ["NA", "Value", "NA"])
+x.add_row(["12", "[What happened in these files? From 11.]"] + ["-", "-", "-"])  
 
 print(x)
 
