@@ -32,6 +32,7 @@ import json
 import numpy as np
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 from plotly.subplots import make_subplots
+from scipy import stats
 
 # =============================================================================
 # Declares
@@ -139,11 +140,14 @@ def plotly_subplot_mod(data_x, data_y_TH, data_y_DH, output_title, output):
         
         #print("Adding:", row_count, col_count)
         
-        fig.add_trace(go.Scatter(x=data_x[item], y=data_y_TH[item], opacity=0.75),
+        fig.add_trace(go.Scatter(x=data_x[item], y=data_y_DH[item],opacity=0.65),
                   row=row_count, col=col_count)
         
-        fig.add_trace(go.Scatter(x=data_x[item], y=data_y_DH[item], opacity=0.75),
+        fig.add_trace(go.Scatter(x=data_x[item], y=data_y_TH[item]),
                   row=row_count, col=col_count)
+        
+        #fig.add_trace(go.Scatter(x=data_x[item], y=data_y_DH[item],opacity=0.65),
+        #          row=row_count, col=col_count)
         
         Threshold_TH = THRESHOLD_TH_VALUE * np.mean(data_y_TH[item])
         #print("TH threshold multiplier:", THRESHOLD_TH_VALUE)
@@ -212,8 +216,8 @@ def plotly_subplot_mod(data_x, data_y_TH, data_y_DH, output_title, output):
 def plotly_basicline(data_x, data_y_TH, data_y_DH, output_title, output):
     global output_dir
     
-    trace0 = go.Scatter(x = data_x, y = data_y_TH, mode = 'lines+markers', name="Three Hit", opacity=0.75)
-    trace1 = go.Scatter(x = data_x, y = data_y_DH, mode = 'lines+markers', name="Double Hit", opacity=0.75)
+    trace0 = go.Scatter(x = data_x, y = data_y_TH, mode = 'lines+markers', name="Three Hit", opacity=0.65)
+    trace1 = go.Scatter(x = data_x, y = data_y_DH, mode = 'lines+markers', name="Double Hit", opacity=0.65)
     
     data = [trace0, trace1]
     
@@ -287,14 +291,21 @@ for filename in files:
         count += 1
 print("Number of files which have 1 TH site 10x above the Evidence Ratio mean?", count)
 
+
+
+
 count = 0
 x10_thresholded_files = []
+stats_x10_thresholded_files = []
 for filename in thresholded_files:
-    if len(EvidenceRatio_threshold(filename)) > 0: #returns the site where ER is at least 10x above mean
+    filename_ERs = len(EvidenceRatio_threshold(filename))
+    if filename_ERs > 0: #returns the site where ER is at least 10x above mean
         x10_thresholded_files.append(filename) #holds the 10x above mean thresholded files
+        stats_x10_thresholded_files.append(filename_ERs)
         count += 1
-print("Number of THRESHOLDED files which have 1 TH site 10x above the Evidence Ratio mean?", count)
 
+print("Number of THRESHOLDED files which have 1 TH site 10x above the Evidence Ratio mean?", count)
+print(stats.describe(np.asarray(stats_x10_thresholded_files)))
 
 
 #Lets raise the mean multiplier
