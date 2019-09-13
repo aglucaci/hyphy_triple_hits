@@ -1,0 +1,16 @@
+Total number of .jsons: 13303
+Positive omegas (TH, DH, SH): [210, 213, 215]
+Omega comparison UP ([vsDH, vsSH], [vsTH, vsSH], [vsTH, vsDH]) [4301, 13] [629, 14] [4917, 4916]
+Omega comparison Down ([vsDH, vsSH], [vsTH, vsSH], [vsTH, vsDH]) [629, 4917] [4301, 4916] [13, 14]
++---+--------------------------------------------+---------------------------------------------------------+----------------------------------------------+------------------------+
+| # |                                            | MG94 with double and triple instantaneous substitutions | MG94 with double instantaneous substitutions |     Standard MG94      |
++---+--------------------------------------------+---------------------------------------------------------+----------------------------------------------+------------------------+
+| 1 |      number of files with omega > 1.0      |                           210                           |                     213                      |          215           |
+| 2 |         Are they the same files?           |                     DH(207) SH(200)                     |               TH(207) SH(200)                |    TH(200) DH(200)     |
+| 3 | Number of files with p<0.05 for THvsDH LRT |                           4930                          |                      NA                      |           NA           |
+| 4 |         Are these the same files?          |                            11                           |                      11                      |           18           |
+| 5 |  [What happened in these files? From 3.]   |                            -                            |                      -                       |           -            |
+| 6 |              -> Omega went up              |                   (vsDH, vsSH) 4301 13                  |             (vsTH, vsSH) 629 14              | (vsTH, vsDH) 4917 4916 |
+| 7 |          -> Omega stayed the same          |                            NA                           |                      NA                      |           NA           |
+| 8 |             -> Omega went down             |                         629 4917                        |                  4301 4916                   |         13 14          |
++---+--------------------------------------------+---------------------------------------------------------+----------------------------------------------+------------------------+

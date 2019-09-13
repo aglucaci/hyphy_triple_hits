@@ -33,6 +33,8 @@ change_types["TH"] = 0
 #DHT2 is a skip the middle type, nontandem 2 nucleotide change
 total_TH = []
 
+
+
 # =============================================================================
 # Helper funcs.
 # =============================================================================
@@ -160,6 +162,26 @@ def read_json(filename):
                             
     #print("num TH change:", num_change)
     total_TH.append(num_change)
+    
+    
+def pass_pvalue_threshold(filename):
+    global pvalue_threshold
+    #pvalue_threshold = 10000
+    
+    with open(filename, "r") as fh:
+        json_data = json.load(fh)
+    fh.close()
+    
+    file_pvalue = json_data["test results"]["Triple-hit vs double-hit"]["p-value"]
+    
+    
+    #print(filename, file_pvalue)
+    if float(file_pvalue) < pvalue_threshold:
+        passed = True
+    else:
+        passed = False
+        
+    return passed
 # =============================================================================
 # Main subroutine
 # =============================================================================
@@ -175,13 +197,15 @@ def read_json(filename):
 
 path = sys.argv[1]
 output_filename = sys.argv[2]
-         
+#pvalue_threshold = 10000   
+pvalue_threshold = float(sys.argv[3])   
 files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith(".json")]
 #files = ["/Users/user/Documents/Pond Lab/Triple hits/Analysis/selectome_trip_ammended_analysis/ENSGT00670000097768.Euteleostomi.003.nex.FITTER.json"]
 
 for file in files:
     #print(file)
-    read_json(file)
+    if pass_pvalue_threshold(file) == True:
+        read_json(file)
 
 #print(len(codon_change), len(codon_change["AGG"]))
 
@@ -203,7 +227,7 @@ for (key, value) in codon_change.items(): #DICT
     data[key] = {}
     
     for (key2, value2) in codon_change[key].items(): #NESTED DICT
-        if codon_change[key][key2] >= 200:
+        if codon_change[key][key2] >= 0:
             data[key][key2] =  codon_change[key][key2]
         #print(key, value)
         #data[key] = ""
@@ -213,6 +237,18 @@ for (key, value) in codon_change.items(): #DICT
         #pop it
         #data[key] = value
     
+
+
+
+#data[key]
+num_data = 0 
+#Count of total TH change:
+for k in data:
+    #print(k)
+    for j in data[k]:
+        #print(codon_change[k][j])
+        num_data += data[k][j]
+print("\tTotal number of TH codon changes, after applying Codon to Codon threshold filter:", num_data)
 
 
 #print(data)
