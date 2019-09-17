@@ -17,7 +17,7 @@ from scipy.stats import iqr
 # =============================================================================
 # Declares
 # =============================================================================
-path = "/Users/user/Documents/Poster/SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
+path = "/Users/alex/Documents/TRIPLE_HITS/SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
 files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith(".json")]
 
 # =============================================================================
@@ -92,33 +92,29 @@ delta_AICc_DHvsSH = []
 
 delta_omega_THvsSH = []
 delta_omega_DHvsSH = []
-SH_omega_values = []
-SH_AICc_values = [] 
+SH_omega = []
 
 print("Reading through files:", len(files))
 for n, file in enumerate(files):
-    if n % 1000 == 0: print(n)
     #Rates
     TH_Rate, DH_Rate1, DH_Rate2 = read_json_THDHRate(file)
     
     TH_TH_Rate.append(float(TH_Rate))
-    TH_DH_Rate.append(float(DH_Rate1))
-    DH_DH_Rate.append(float(DH_Rate2))
+    TH_DH_Rate.append(DH_Rate1)
+    DH_DH_Rate.append(DH_Rate2)
 
     #AICc
     TH_AICc, DH_AICc, SH_AICc = read_json_AICc(file)
     
     delta_AICc_THvsSH.append(float(TH_AICc) - float(SH_AICc))
     delta_AICc_DHvsSH.append(float(DH_AICc) - float(SH_AICc))
-    SH_AICc_values.append(float(SH_AICc))
+    
     
     #Omegas
     TH_omega, DH_omega, SH_omega = read_json_Omegas(file)
     
     delta_omega_THvsSH.append(float(TH_omega) - float(SH_omega))
     delta_omega_DHvsSH.append(float(DH_omega) - float(SH_omega))
-    
-    SH_omega_values.append(float(SH_omega))
     
     
     
@@ -141,8 +137,4 @@ mean_and_IQR(delta_AICc_DHvsSH, "delta AICc DHvsSH")
 #delta omega (mean and IQR)
 mean_and_IQR(delta_omega_THvsSH, "delta omega THvsSH")
 mean_and_IQR(delta_omega_DHvsSH, "delta omega DHvsSH")
-
-
-mean_and_IQR(SH_omega_values, "SH OMEGA")
-mean_and_IQR(SH_AICc_values, "SH AICc")
 
