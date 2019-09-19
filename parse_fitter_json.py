@@ -10,31 +10,68 @@ Created on Fri Feb 22 11:49:59 2019
 6/2019: Modified to handle the output from the FitMultiModel with SRV added.
 
 """
+
+"""
+    MAKE THIS A PIPELINE
+    
+    INPUT: FITTERS DIRECTORY
+    
+    Circos: circos_grab_site_substitution_data.py <FITTERS DIRECTORY> <OUTPUTTXT>
+    
+    parse_fitter_json.py <FITTERS DIRECTORY> <OUTPUTCSV>
+    
+    plot_csv.py
+    
+    plot_pvalue_vs_seqlength.py
+    
+    plot_2LogEvidenceRatio.py
+    
+    physiochemical_triple_changes.py
+    
+    Serine_to_Serine.py
+"""
+
 # =============================================================================
 # Imports
 # =============================================================================
 import json, csv, os
+import sys
 
 # =============================================================================
 # Declares
 # =============================================================================
-#Mac, in Philly
-#path = "/Users/user/Documents/Pond Lab/Triple hits/BUSTED_SIM_SRV"
-#On Windows: Processed on computer in NYC.
-#path = r"E:\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
-path = r"E:\BUSTED_SIM_SRV_FITTER_JSON\BUSTED_SIM_SRV_FITTER_JSON"
+path = "/Users/alex/Documents/TRIPLE_HITS/FITTERS/SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
 
 #Look for this ending.
 file_ending = "FITTER.json"
 
 #Output CSF Filename
-file_output = "BUSTED_SIM_SRV.csv"
+file_output = "SELECTOME_TREELENGTHS_BRANCHLENGTHS.csv"
+with open(file_output, "w") as f:
+    f.write("")
+f.close()
 
-#file_output = "SELECTOME_TRIP_AMMENDED_SRV.csv"
-#file_output = "SELECTOME_TRIP_AMMENDED_SRV_DEBUG.csv"
 # =============================================================================
 # Helper functions
 # =============================================================================
+def sum_branchlengths(branch_attributes, model):
+    #pass
+    #print(branch_attributes)
+    treelength = 0
+    for key in branch_attributes.keys():
+        #print(key, branch_attributes[key][model])
+        treelength += float(branch_attributes[key][model])
+    return treelength
+
+def report_branchlengths(branch_attributes, model):
+    taxa_bl_dict = {}
+    
+    for key in branch_attributes.keys():
+        taxa_bl_dict[key] = branch_attributes[key][model]
+    
+    return taxa_bl_dict
+        
+
 def read_json(filename):
     this_row = []
     with open(filename, "r") as fh:
@@ -43,7 +80,7 @@ def read_json(filename):
         this_row.append(json_data["input"]["file name"].split("/")[-1])
         this_row.append(json_data["input"]["number of sequences"])
         this_row.append(json_data["input"]["number of sites"])
-
+        
         this_row.append(json_data["test results"]["Double-hit vs single-hit"]["LRT"])
         this_row.append(json_data["test results"]["Double-hit vs single-hit"]["p-value"])
         this_row.append(json_data["test results"]["Triple-hit vs double-hit"]["LRT"])
@@ -105,7 +142,31 @@ def read_json(filename):
         this_row.append(json_data["fits"]["Standard MG94"]["Rate Distributions"]["parameters"]["Mixture auxiliary weight for GDD category 2"])
         this_row.append(json_data["fits"]["Standard MG94"]["Rate Distributions"]["distribution"])
 
-        #GENES WITH TRIPLE HIT RATES ABOVE 1
+        #Tree lengths
+        TREE_data = json_data["branch attributes"]["0"]
+        #Triple hit Tree length
+        TH_TL = sum_branchlengths(TREE_data, "MG94 with double and triple instantaneous substitutions")
+        #Double hit tree length
+        DH_TL = sum_branchlengths(TREE_data, "MG94 with double instantaneous substitutions")
+        #Single hit tree length
+        SH_TL = sum_branchlengths(TREE_data, "Standard MG94")
+        
+        #print(TH_TL, DH_TL, SH_TL)
+        this_row.append(TH_TL)
+        this_row.append(DH_TL)
+        this_row.append(SH_TL)
+        
+        
+        #Branch attributes
+        TH_BA = report_branchlengths(TREE_data, "MG94 with double and triple instantaneous substitutions")
+        DH_BA = report_branchlengths(TREE_data, "MG94 with double and triple instantaneous substitutions")
+        SH_BA = report_branchlengths(TREE_data, "Standard MG94")
+        
+        #print(TH_BA)
+        this_row.append(TH_BA)
+        this_row.append(DH_BA)
+        this_row.append(SH_BA)
+                
     fh.close()
     writeto_csv(filename, this_row)
 
@@ -144,6 +205,8 @@ columns += ["non-synonymous/synonymous rate ratio"]
 
 columns += ["GDD rate category 1.single", "GDD rate category 2.single", "GDD rate category 3.single","Mixture auxiliary weight for GDD category 1.single", "Mixture auxiliary weight for GDD category 2.single"]
 columns += ["distribution.single"]
+columns += ["Tree Length - MG94 with double and triple instantaneous substitutions", "Tree Length - MG94 with double instantaneous substitutions", "Tree Length - Standard MG94"]
+columns += ["Branch Attributes - MG94 with double and triple instantaneous substitutions", "Branch Attributes - MG94 with double instantaneous substitutions", "Branch Attributes - Standard MG94"]
 
 #path = os.getcwd()
 #path="/home/swisotsky/data/selectome_4_11_19/data/"
@@ -151,7 +214,10 @@ columns += ["distribution.single"]
 files = [path+"/"+f.name for f in os.scandir(path) if f.name.endswith(file_ending)]
 
 wrote_columns = False
+
 count = 0
+
+
 for file in files:
     print(count, file)
     read_json(file)
