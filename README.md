@@ -52,3 +52,5 @@
 ### run_alignstat.R
     -used to run alignstat (generates quality scores for alignments)
     
+### mutationType_by_branches.py
+    -looks at mutation classification via site substitutions and outputs a TSV file with the associated branches where the mutation(s) occurred. 
