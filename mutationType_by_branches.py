@@ -83,7 +83,8 @@ def read_json(filename):
             for to_codon in this_row[0][k][keys]:  
                 
               mutation_type = diff_counter(from_codon, to_codon)
-              
+        
+              #str(this_row[0][k][keys][to_codon])]) are, effectively, the branches
               print(delimiter.join([short_filename, k, mutation_type, str(this_row[0][k][keys][to_codon])]))
                     
     
