@@ -52,13 +52,13 @@ def diff_counter(from_codon, to_codon):
     if count == 1: 
         #change_types["SH"] += counter
         return "SH"
-    
-    if count == 3: 
-        #change_types["TH"] += counter
-        return "TH"
     if count == 2:
         #change_types["TH"] += counter
         return "DH"
+    if count == 3: 
+        #change_types["TH"] += counter
+        return "TH"
+
 
 
 
