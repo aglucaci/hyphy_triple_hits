@@ -40,7 +40,7 @@ delimiter = "\t"
 # =============================================================================
 def diff_counter(from_codon, to_codon):
     count = 0
-    
+    #counts
     if from_codon[0] != to_codon[0]: 
         count += 1
     if from_codon[1] != to_codon[1]: 
