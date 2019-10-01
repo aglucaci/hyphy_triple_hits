@@ -15,6 +15,7 @@ echo $HYPHY
 echo $LIBPATH
 echo $DATA_DIR
 echo $BATCH_FILE_PRE
+echo .
 
 #PRE-PROCESSING
 
@@ -27,10 +28,12 @@ done
 
 #MAFFT
 
+echo .
 echo "Running mafft on protein sequences"
 
 for f in "$DATA_DIR"*.fasta
 do
+   echo "Aligning $f_protein.fas file.."
    PROTEIN_SEQ=$f"_protein.fas"
 
    #mafft $PROTEIN_SEQ > $f"_protein_aligned.fas"
