@@ -1,3 +1,6 @@
+#Jordan Zehr and Alexander G. Lucaci
+
+
 clear
 
 echo "HYPHY PIPELINE PROGRAM"
