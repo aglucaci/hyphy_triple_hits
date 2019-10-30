@@ -21,6 +21,10 @@ issues with f and mu
  
 This script looks to analyze the Evidence ratio data from FITTER.JSON and create some summary statistics
 
+
+@usage silverback
+
+python36 pipeline_analysis_EvidenceRatio.py <> <> <>
 """
 
 # =============================================================================
@@ -44,8 +48,8 @@ import os
 #directory = r"E:\SELECTOME_TRIP_AMMENDED_SRV\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
 #output_dir = r"E:\SELECTOME_TRIP_AMMENDED_SRV\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_HTML"
 directory = sys.argv[1]
-output_dir = sys.argv[2]
-fname = sys.argv[3]
+output_dir = sys.argv[2] 
+fname = sys.argv[3] 
 
 #fname = "analysis_" #Output file
 pvalue_threshold = 0.05
@@ -194,7 +198,7 @@ for root, dirs, files in os.walk(directory):
             existing = os.path.join(directory, name + ext)
             main_sub(existing, each_file, file_count)
             file_count += 1
-            if file_count == 12: break
+            #if file_count == 12: break
             
             
 # SUMARY STATISTICS
