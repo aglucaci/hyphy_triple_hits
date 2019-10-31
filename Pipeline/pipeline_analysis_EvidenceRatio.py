@@ -21,17 +21,13 @@ issues with f and mu
  
 This script looks to analyze the Evidence ratio data from FITTER.JSON and create some summary statistics
 
-
-@usage silverback
-
-python36 pipeline_analysis_EvidenceRatio.py <> <> <>
 """
 
 # =============================================================================
 # Imports
 # =============================================================================
-import plotly.graph_objs as go
-from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+#import plotly.graph_objs as go
+#from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import numpy as np
 import json, csv, os, sys
 from shutil import copyfile
@@ -48,8 +44,8 @@ import os
 #directory = r"E:\SELECTOME_TRIP_AMMENDED_SRV\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
 #output_dir = r"E:\SELECTOME_TRIP_AMMENDED_SRV\SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON_HTML"
 directory = sys.argv[1]
-output_dir = sys.argv[2] 
-fname = sys.argv[3] 
+output_dir = sys.argv[2]
+fname = sys.argv[3]
 
 #fname = "analysis_" #Output file
 pvalue_threshold = 0.05
@@ -78,6 +74,7 @@ def load_json(filename, file_count):
         DH = json_data["Evidence Ratios"]["Two-hit"][0]
         SITES = json_data["input"]["number of sites"] #can also calculated from the len of DH or TH
         THvsDH_LRT_pvalue = json_data["test results"]["Triple-hit vs double-hit"]["p-value"]
+        #DHvsSH_LRT_prvalue =
         Site_subs = json_data["Site substitutions"]
     fh.close()
     
@@ -111,7 +108,8 @@ def main_sub(filename, output_title, file_count):
     #Load data from .FITTER.json
     EvidenceRatio_TH, EvidenceRatio_DH, Sites, Site_subs, THvsDH_LRT_pvalue = load_json(filename, file_count)
 
-    if float(THvsDH_LRT_pvalue) >= pvalue_threshold: return
+    #REMOVE P VALUE THRESHOLDING.
+    if float(THvsDH_LRT_pvalue) > pvalue_threshold: return
     
     # -- Analysis
     #given the evidence ratio values.
@@ -125,7 +123,7 @@ def main_sub(filename, output_title, file_count):
     
     print("Triple hit - Threshold", Threshold_TH)
     print("Double hit - Threshold", Threshold_DH)
-    print("Number of Sites:", len(Sites))
+    print("Number of Sites:", len(Sites)) #total number of sites
     
     msg = []
     msg.append(filename.split("\\")[-1]) 
@@ -135,6 +133,10 @@ def main_sub(filename, output_title, file_count):
     msg.append(str(Threshold_TH))
     msg.append(str(Threshold_DH)) #
     
+    #PRINT OUT EVIDENCE RATIOS
+    #print(EvidenceRatio_TH)
+    #print(EvidenceRatio_DH)
+
     #filter
     #http://book.pythontips.com/en/latest/map_filter.html
     Filtered_Threshold_TH = list(filter(lambda x: x > Threshold_TH, EvidenceRatio_TH))
@@ -144,8 +146,12 @@ def main_sub(filename, output_title, file_count):
     msg.append(str(THvsDH_LRT_pvalue))
     
     if Filtered_Threshold_TH > []:
+        msg.append(str(len(Filtered_Threshold_DH)))
         msg.append(str(len(Filtered_Threshold_TH)))
         
+        print("Number of DH sites:", len(Filtered_Threshold_DH))
+        
+
         print("Number of TH sites:", len(Filtered_Threshold_TH))
         TH_Sites_avg.append(len(Filtered_Threshold_TH))
         
@@ -182,7 +188,7 @@ print("() Starting Evidence ratio analysis")
 file_count, count = 0, 0 #For Analysis, Plotting respectively.
 
 # -- Init. Output file
-header = ["Filename", "Total Num of Sites", "TH Mean", "DH Mean", "TH Threshold", "DH Threshold", "THvsDH_LRT_pvalue", "TH - Num of Sites", "TH Sites Location & Codon"]
+header = ["Filename", "Total Num of Sites", "TH Mean", "DH Mean", "TH Threshold", "DH Threshold", "THvsDH_LRT_pvalue", "DH - Num of Sites (above Threshold)", "TH - Num of Sites (above Threshold)", "TH Sites Location & Codon"]
 with open(os.path.join(output_dir,fname), 'w') as f:
     f.write("\t ".join(header) + "\n")
 f.close()
@@ -202,8 +208,10 @@ for root, dirs, files in os.walk(directory):
             
             
 # SUMARY STATISTICS
-print("\n", stats.describe(np.asarray(TH_Sites_avg)))
-
+if len(TH_Sites_avg) > 0:
+    print("\n", stats.describe(np.asarray(TH_Sites_avg)))
+else:
+    print("Error, No TH Sites")
 
 # =============================================================================
 # End of file
