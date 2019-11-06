@@ -54,6 +54,9 @@ KeywordArgument ("rates", "The number omega rate classes to include in the model
 KeywordArgument ("triple-islands", "Use a separate rate parameter for synonymous triple-hit substitutions", "No");
 
 
+// =============================================================================
+// Write batch file description to fitter output (.json)
+// =============================================================================
 fitter.analysis_description = {terms.io.info : "Examine whether or not a codon alignment is better fit by models which permit multiple instantaneous substitutions. v0.2 adds a separate rate for codon-island triple-hit rates",
                            terms.io.version : "0.2",
                            terms.io.authors : "Sergei L Kosakovsky Pond, Sadie Wisotsky and Alexander Lucaci",
@@ -74,7 +77,11 @@ namespace fitter.terms {
     json.site_reports = "Site substitutions";
 }
 
-fitter.json    = { terms.json.analysis: fitter.analysis_description,
+// =============================================================================
+// Initializes the fitter (.json)
+// =============================================================================
+
+fitter.json    = {terms.json.analysis: fitter.analysis_description,
                terms.json.input: {},
                terms.json.fits : {},
                terms.json.timers : {},
@@ -104,9 +111,7 @@ fitter.rate_classes = io.PromptUser ("The number of omega rate classes to includ
 
 fitter.do_islands = io.SelectAnOption ({"Yes" : "Use a separate rate parameter for synonymous triple-hit substitutions (e.g. serine islands)",
                                     "No"  : "All triple hits have the same rate multiplier"},
-                                    "Synonymous triple-hit substitutions use a separate rate"
-                                    ) == "Yes";
-
+                                    "Synonymous triple-hit substitutions use a separate rate) == "Yes";
 
 namespace fitter {
     doGTR ("fitter");
@@ -117,7 +122,6 @@ fitter.codon_data_info [terms.json.json] = io.PromptUserForFilePath ("Save the r
 
 KeywordArgument ("save-fit", "Write model fit files (HyPhy NEXUS) to this file path with extensions .MODEL_NAME.bf; default is NOT to save, or 'dev/null'", "/dev/null");
 fitter.save_model_path = io.PromptUserForFilePath ("Save model fit files to");
-
 
 estimators.fixSubsetOfEstimates(fitter.gtr_results, fitter.gtr_results[terms.global]);
 
