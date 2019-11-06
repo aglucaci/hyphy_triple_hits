@@ -1,6 +1,11 @@
+# =============================================================================
+# Signal to Hyphy core which library we need.
+# =============================================================================
 RequireVersion ("2.4.0");
 
-
+# =============================================================================
+# Imports - Load Libraries
+# =============================================================================
 LoadFunctionLibrary("libv3/all-terms.bf"); // must be loaded before CF3x4
 LoadFunctionLibrary("libv3/UtilityFunctions.bf");
 LoadFunctionLibrary("libv3/IOFunctions.bf");
@@ -19,7 +24,9 @@ LoadFunctionLibrary("libv3/convenience/math.bf");
 LoadFunctionLibrary("libv3/models/rate_variation.bf");
 LoadFunctionLibrary("libv3/models/codon/BS_REL.bf");
 
-
+# =============================================================================
+# Declares
+# =============================================================================
 utility.SetEnvVariable ("NORMALIZE_SEQUENCE_NAMES", TRUE);
 //utility.SetEnvVariable ("VERBOSITY_LEVEL", 10);
 fitter.rate_classes = 3;
@@ -121,6 +128,10 @@ namespace fitter {
 
 //Export(lf_serialized, ^(fitter.partioned_mg_results));
 //fprintf(PROMPT_FOR_FILE,CLEAR_FILE, lf_serialized, "\n");
+
+# =============================================================================
+# Helper Functions (Global)
+# =============================================================================
 
 //*************** GENERIC FITTER HANDLER *****
 
@@ -251,6 +262,10 @@ utility.Extend (fitter.two_hit_results[terms.global],
                 });
 
 
+# =============================================================================
+# Helper functions (Local)
+# =============================================================================
+
 lfunction fitter.MG_REV_TRIP.model.with.GDD (type, code) {
     model = MG_REV_TRIP.model.with.GDD (type, code);
     model[utility.getGlobalValue("terms.model.post_definition")] = "fitter.handle_triple_islands";
@@ -284,6 +299,10 @@ if (fitter.do_islands) {
 //
 
 selection.io.stopTimer (fitter.json [terms.json.timers], "Overall");
+
+# =============================================================================
+# 
+# =============================================================================
 
 // PERFORM HYPOTHESIS TESTING AND POPULATE TABLE REPORT
 
@@ -360,9 +379,6 @@ fprintf(stdout, io.FormatTableRow(
 );
 
 if (fitter.do_islands) {
-
-
-
     fprintf(stdout, io.FormatTableRow(
         {
          {
@@ -449,13 +465,9 @@ if (fitter.do_islands) {
 }
 
 if (utility.Array1D (fitter.callout)) {
-
     // reconstruct ancestors here
-
     fitter.site_reports = {};
-
     fitter.ancestral_cache = ancestral.build (fitter.three_hit_results[terms.likelihood_function], 0, None);
-
     io.ReportProgressMessageMD ("fitter", "sites", "" + utility.Array1D (fitter.callout) + " individual " + io.SingularOrPlural (utility.Array1D (fitter.callout) , "site", "sites") + " which showed sufficiently strong preference for multiple-hit models");
     fitter.table_output_options = {
             utility.getGlobalValue("terms.table_options.header"): TRUE,
@@ -468,8 +480,6 @@ if (utility.Array1D (fitter.callout)) {
                 "3": 60
             }
         };
-
-
     if (fitter.do_islands) {
         (fitter.table_output_options[utility.getGlobalValue("terms.table_options.column_widths")]) [3] = 25;
         (fitter.table_output_options[utility.getGlobalValue("terms.table_options.column_widths")]) [4] = 25;
@@ -487,12 +497,9 @@ if (utility.Array1D (fitter.callout)) {
         };
     }
     fprintf(stdout, "\n", io.FormatTableRow(fitter.report , fitter.table_output_options));
-
     fitter.table_output_options[utility.getGlobalValue("terms.table_options.header")] = FALSE;
     utility.ForEachPair (fitter.callout, "_site_", "_value_", "
-
          fitter.site_reports [_site_] = (ancestral.ComputeSubstitutionBySite (fitter.ancestral_cache, +_site_, None))[terms.substitutions];
-
              if (fitter.do_islands) {
                  fprintf(stdout, io.FormatTableRow(
                     {
@@ -520,17 +527,12 @@ if (utility.Array1D (fitter.callout)) {
                 , fitter.table_output_options));
             }
     ");
-
     fitter.json [fitter.terms.json.site_reports] = fitter.site_reports;
-
-
 } else {
     io.ReportProgressMessageMD ("fitter", "sites", "No individual sites showed sufficiently strong preference for multiple-hit models");
-
 }
 
 io.ReportProgressMessageMD ("fitter", "writing", "Writing detailed analysis report to \`" + fitter.codon_data_info [terms.json.json] + "\'");
-
 io.SpoolJSON (fitter.json, fitter.codon_data_info [terms.json.json]);
 return fitter.json;
 
@@ -541,12 +543,10 @@ lfunction fitter.EvidenceRatios (ha, h0) {
 
 
 //------------------------------------------------------------------------------
-
 lfunction fitter.SubstitutionHistory (subs) {
     result = "";
     result * 128;
     keys = utility.sortStrings (utility.Keys (subs));
-
     for (i = 0; i < Abs (subs); i+=1) {
         source  = keys[i];
         targets  = subs[source];
@@ -559,8 +559,10 @@ lfunction fitter.SubstitutionHistory (subs) {
            result * (keys2[k] + "(" + Abs(targets[keys2[k]]) + ")");
         }
     }
-
     result * 0;
     return result;
-
 }
+
+# =============================================================================
+# End of file.
+# =============================================================================
