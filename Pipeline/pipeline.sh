@@ -1,6 +1,6 @@
 #!/bin/bash 
 clear
-echo "## ANALYSIS PIPELINE FOR TRIPLE HITS"
+echo "## ANALYSIS PIPELINE FOR TRIPLE HITS NEW RESULTS"
 echo "Current date : $(date) @ $(hostname)"
 echo "WD: "$(pwd)
 
@@ -13,54 +13,30 @@ echo "WD: "$(pwd)
 
 # USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING
 # PROJECT DIRECTORY
-BASEDIRECTORY="/Users/alex/Documents/TRIPLE_HITS"
+BASEDIRECTORY="/Users/user/Documents/TRIPLE_HITS_NEW_RESULTS"
 
-# 08282019 - Selectome Analysis
-FITTERS="/Users/alex/Documents/TRIPLE_HITS/SELECTOME_TRIP_AMMENDED_SRV_FITTER_JSON"
-#FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/WO_SERINES_ALLFILES_FITTERS_JSON"
-CSVFILE="SELECTOME_SRV.csv"
-#CIRCOSTEXTFILE="CIRCOS_SELECTOME_SRV_Thresholded_200.txt"
-#This is all TH's
-CIRCOSTEXTFILE1="CIRCOS_SELECTOME_SRV.txt"
+
+#FITTERS="/Users/user/Documents/TRIPLE_HITS_NEW_RESULTS/PETROV"
+#CSVFILE="PETROV_SRV_nr.csv"
+#CSVFILEV02="PETROV_SRV_nr_v02.csv"
+#CIRCOSTEXTFILE1="CIRCOS_PETROV_SRV_nr.txt"
 #This is all TH's thresholded for THvsDH LRT  p value 0.05
-CIRCOSTEXTFILE2="CIRCOS_SELECTOME_SRV_Thresholded_p0_05.txt"
-OUTPUT_FOLDER="../analysis/SELECTOME_SRV_TEST"
+#CIRCOSTEXTFILE2="CIRCOS_PETROV_SRV_nr_Thresholded_p0_05.txt"
+#OUTPUT_FOLDER="../PETROV_SRV_nr"
 
-# 08282019 - Selectome (no S2S) Analysis
-#FITTERS="/Users/alex/Documents/TRIPLE_HITS/WO_SERINES_ALLFILES_FITTERS_JSON"
-#CSVFILE="SELECTOME_SRV_noS2S.csv"
-#CIRCOSTEXTFILE="CIRCOS_SELECTOME_SRV_Thresholded_200_noS2S.txt"
-#OUTPUT_FOLDER="../analysis/SELECTOME_SRV_noS2S"
-
-# 08282019 - mtDNA Vertebrate
-#FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Vertebrate_mtDNA_FITTERS"
-#FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/mtDNA_noS2S/updatedAnalysis_mtDNA_combined_FITTERS"
-#CSVFILE="mtDNA_Vertebrate_SRV.csv"
-#CIRCOSTEXTFILE="CIRCOS_mtDNA_Vertebrate_SRV_Thresholded_200_noS2S.txt"
-#OUTPUT_FOLDER="../analysis/mtDNA_Vertebrate"
-
-# 08282019 - mtDNA Invertebrate
-#FITTERS="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Invertebrate_mtDNA_FITTERS"
-#FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/mtDNA_noS2S/updatedAnalysis_mtDNA_combined_FITTERS"
-#CSVFILE="mtDNA_Invertebrate_SRV.csv"
-#CIRCOSTEXTFILE="CIRCOS_mtDNA_Invertebrate_SRV_Thresholded_200_noS2S.txt"
-#OUTPUT_FOLDER="../analysis/mtDNA_Invertebrate"
-
-
-# 09122019 - Petrov data analysis
-#FITTERS="/Users/alex/Downloads/bestrecip_prank_alignments_SRV_FITTERS_JSON.1"
-#FITTERS_NOSS="/Users/alex/Documents/TRIPLE_HITS/WO_SERINES_ALLFILES_FITTERS_JSON"
-#CSVFILE="PETROV_SRV.csv"
-#CIRCOSTEXTFILE="CIRCOS_SELECTOME_SRV_Thresholded_200.txt"
-#CIRCOSTEXTFILE="CIRCOS_SELECTOME_SRV_pvalue_Thresholded.txt"
-#OUTPUT_FOLDER="../analysis/PETROV_SRV"
+FITTERS="/Users/user/Documents/TRIPLE_HITS_NEW_RESULTS/IMMUNE"
+CSVFILE="IMMUNE_SRV_nr.csv"
+CSVFILEV02="IMMUNE_SRV_nr_v02.csv"
+CIRCOSTEXTFILE1="CIRCOS_IMMUNE_SRV_nr.txt"
+#This is all TH's thresholded for THvsDH LRT  p value 0.05
+CIRCOSTEXTFILE2="CIRCOS_IMMUNE_SRV_nr_Thresholded_p0_05.txt"
+OUTPUT_FOLDER="../IMMUNE_SRV_nr"
 
 
 #Skip creating Evidence ratio plots? 1 for yes, 0 for no (This can take awhile)
 SKIP_EVIDENCERATIOPLOTS=1
 
 # ^^^^^^ USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING ^^^^^^^^
-
 echo "FITTERS FOLDER: "$FITTERS
 echo "File count: "$(ls $FITTERS | wc -l)
 echo ""
@@ -97,6 +73,15 @@ echo ""
 echo "(2) Running: pipeline_parse_fitter_json.py"
 echo "    Saving to: "$OUTPUT_FOLDER/$CSVFILE
 [[ -e $OUTPUT_FOLDER/$CSVFILE ]] || python pipeline_parse_fitter_json.py $FITTERS $OUTPUT_FOLDER/$CSVFILE
+
+# ==============================================================================
+# pipeline_parse_FITTERS_v02.py <FITTERS DIRECTORY> <OUTPUTCSV>
+# Will output branch lengths and total tree length.
+# ==============================================================================
+echo ""
+echo "(2a) Running: pipeline_parse_FITTERS_v02.py"
+echo "    Saving to: "$OUTPUT_FOLDER/$CSVFILE
+[[ -e $OUTPUT_FOLDER/$CSVFILEV02 ]] || python pipeline_parse_FITTERS_v02.py $FITTERS $OUTPUT_FOLDER/$CSVFILEV02
 
 # ==============================================================================
 # pipeline_plot_csv.py <INPUTCSV>
