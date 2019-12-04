@@ -1,37 +1,43 @@
 #!/bin/bash 
 clear
-echo "## ANALYSIS PIPELINE FOR TRIPLE HITS NEW RESULTS"
+echo "## ANALYSIS PIPELINE FOR Multiple Instantaneous Substitutions (MIS) NEW RESULTS"
+echo "## Updated 12-4-2019"
 echo "Current date : $(date) @ $(hostname)"
 echo "WD: "$(pwd)
 
-
-
 #Do variable for FITTERS folder
-#VERTEBRATEfitters="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Vertebrate_mtDNA_FITTERS"
-#INVERTEBRATEfitters="/Users/alex/Documents/TRIPLE_HITS/mtDNA/Invertebrate_mtDNA_FITTERS"
-#COMBINEDfitters="/Users/alex/Documents/TRIPLE_HITS/mtDNA/updatedAnalysis_mtDNA_combined(FASTA_AND_FITTERS)"
+
 
 # USER CAN SET THIS PRIOR TO THE PIPELINE RUNNING
 # PROJECT DIRECTORY
-BASEDIRECTORY="/Users/user/Documents/TRIPLE_HITS_NEW_RESULTS"
 
+BASEDIRECTORY="/Users/alex/Documents/MIS_NEW_RESULTS"
 
-#FITTERS="/Users/user/Documents/TRIPLE_HITS_NEW_RESULTS/PETROV"
-#CSVFILE="PETROV_SRV_nr.csv"
-#CSVFILEV02="PETROV_SRV_nr_v02.csv"
-#CIRCOSTEXTFILE1="CIRCOS_PETROV_SRV_nr.txt"
+TAG="SELECTOME"
+FITTERS="/Users/alex/Documents/MIS_NEW_RESULTS/"$TAG
+
+CSVFILE=$TAG"_SRV_nr.csv"
+CSVFILEV02=$TAG"_SRV_nr_v02.csv"
+CIRCOSTEXTFILE1="CIRCOS_"$TAG"_SRV_TH_nr.txt"
+
 #This is all TH's thresholded for THvsDH LRT  p value 0.05
-#CIRCOSTEXTFILE2="CIRCOS_PETROV_SRV_nr_Thresholded_p0_05.txt"
-#OUTPUT_FOLDER="../PETROV_SRV_nr"
+CIRCOSTEXTFILE2="CIRCOS_"$TAG"_SRV_nr_Thresholded_p0_05.txt"
 
-FITTERS="/Users/user/Documents/TRIPLE_HITS_NEW_RESULTS/IMMUNE"
-CSVFILE="IMMUNE_SRV_nr.csv"
-CSVFILEV02="IMMUNE_SRV_nr_v02.csv"
-CIRCOSTEXTFILE1="CIRCOS_IMMUNE_SRV_nr.txt"
+CIRCOSTEXTFILE3=CIRCOSTEXTFILE1="CIRCOS_"$TAG"_SRV_DH_nr.txt"
+
+OUTPUT_FOLDER=$BASEDIRECTORY"/"$TAG"_SRV_nr"
+
+
+#TAG=""
+#FITTERS="/Users/alex/Documents/MIS_NEW_RESULTS/SELECTOME"
+#CSVFILE="SELECTOME_SRV_nr.csv"
+#CSVFILEV02="SELECTOME_SRV_nr_v02.csv"
+#CIRCOSTEXTFILE1="CIRCOS_SELECTOME_SRV_nr.txt"
+
 #This is all TH's thresholded for THvsDH LRT  p value 0.05
-CIRCOSTEXTFILE2="CIRCOS_IMMUNE_SRV_nr_Thresholded_p0_05.txt"
-OUTPUT_FOLDER="../IMMUNE_SRV_nr"
+#CIRCOSTEXTFILE2="CIRCOS_SELECTOME_SRV_nr_Thresholded_p0_05.txt"
 
+#OUTPUT_FOLDER=$BASEDIRECTORY"/SELECTOME_SRV_nr"
 
 #Skip creating Evidence ratio plots? 1 for yes, 0 for no (This can take awhile)
 SKIP_EVIDENCERATIOPLOTS=1
@@ -65,6 +71,18 @@ echo "    Saving to: "$OUTPUT_FOLDER/$CIRCOSTEXTFILE2
 echo "    Logfile: "$OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data_pvalue.txt 
 
 [[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE2 ]] || python pipeline_circos_grab_site_substitution_data.py $FITTERS $OUTPUT_FOLDER/$CIRCOSTEXTFILE2 0.05 > $OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data_pvalue.txt 
+
+# ==============================================================================
+# pipeline_circos_grab_site_substitution_data.py <FITTERS DIRECTORY> <OUTPUTTXT>
+# ==============================================================================
+echo "(1.2) Running: pipeline_circos_grab_site_substitution_data.py"
+echo "    Saving to: "$OUTPUT_FOLDER/$CIRCOSTEXTFILE1
+echo "    Logfile: "$OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data.txt
+
+#rm -f $OUTPUT_FOLDER/$CIRCOSTEXTFILE
+#[[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE ]] ||
+[[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE1 ]] || python pipeline_circos_grab_site_substitution_data.py $FITTERS $OUTPUT_FOLDER/$CIRCOSTEXTFILE1 10000 > $OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data.txt
+#python pipeline_circos_grab_site_substitution_data.py $FITTERS $OUTPUT_FOLDER/$CIRCOSTEXTFILE
 
 # ==============================================================================
 # pipeline_parse_fitter_json.py <FITTERS DIRECTORY> <OUTPUTCSV>
