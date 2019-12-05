@@ -1,4 +1,4 @@
--	GTC	AGG	CAC	TGT	AGT	TCA	TCC	AGC	GGG	TCT	CCA	ACG	CTG	ACA	TCG	CAG	CGC	CCT	TAC	GAA	GTT	GCC	GGC	TGC	ATT	AAG	TTT	GTG	TTG	ATG	ACC	CTC	ACT	AAT	CGT	GCG	GAG	CCC	GCA	GAC	GAT	GGA	CTA	CAA	TAT	GGT	GCT	AAC	CAT	TTC	AAA	AGA	CTT	GTA	ATC	ATA	TTA	TGG	CGG	CGA	CCG
+	GTC	AGG	CAC	TGT	AGT	TCA	TCC	AGC	GGG	TCT	CCA	ACG	CTG	ACA	TCG	CAG	CGC	CCT	TAC	GAA	GTT	GCC	GGC	TGC	ATT	AAG	TTT	GTG	TTG	ATG	ACC	CTC	ACT	AAT	CGT	GCG	GAG	CCC	GCA	GAC	GAT	GGA	CTA	CAA	TAT	GGT	GCT	AAC	CAT	TTC	AAA	AGA	CTT	GTA	ATC	ATA	TTA	TGG	CGG	CGA	CCG
 ACT	2.0	-	-	-	-	-	-	-	-	-	-	-	1.0	-	-	2.0	-	-	1.0	1.0	-	-	-	-	-	-	-	3.0	-	-	-	1.0	-	-	-	-	1.0	-	-	1.0	-	-	1.0	1.0	-	-	-	-	-	-	-	-	-	1.0	-	-	-	-	-	-	-
 CAT	1.0	2.0	-	-	-	1.0	2.0	1.0	-	-	-	-	-	1.0	-	-	-	-	-	-	-	1.0	-	-	-	-	-	1.0	-	4.0	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 CAA	2.0	-	-	-	2.0	-	-	1.0	-	3.0	-	-	-	-	-	-	-	-	-	-	1.0	3.0	-	-	-	-	1.0	-	-	-	-	-	1.0	-	-	-	-	-	-	-	-	-	-	-	-	1.0	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
