@@ -56,7 +56,7 @@ control_file.append("[PARTITIONS] partitionname             //  [PARTITIONS] blo
 control_file.append("  [treename modelname 1000]            //  which trees and define the length of the")
 control_file.append("                                       //  sequence generated at the root (1000 here).")
 control_file.append("")
-control_file.append("[EVOLVE] partitionname 1 output1  //  This will generate 100 replicate datasets ")
+control_file.append("[EVOLVE] partitionname 1 CODON_INDEL_SIMS_1  //  This will generate 100 replicate datasets ")
 
 
 
@@ -72,8 +72,8 @@ control_file.append("// models) please consult the manual or the other example c
 
 INDEL_RATE = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
-OUTPUT_FILENAME_TAG = "output"
-num_output_files = 3 #number of files to simulate
+OUTPUT_FILENAME_TAG = "CODON_INDEL_SIMS_"
+num_output_files = 30 #number of files to simulate
 
 # =============================================================================
 # Main subroutine
@@ -90,41 +90,53 @@ num_output_files = 3 #number of files to simulate
 
 #Run the indelible binary.
 
-with open("control.txt", "w") as f:
-    
-    for line in control_file:
-        #print(line)
+def main(RATE):
+    with open("control.txt", "w") as f:
         
-        if "indelrate" in line: #adjust indelrate
-            pass
-        
-        if "EVOLVE" in line:
-            #write the line, write how many files we want as output
-            #and then continue
+        for line in control_file:
+            #print(line)
+            
+            if "indelrate" in line: #adjust indelrate
+                pass
+                f.write("  [indelrate]    " + str(RATE) + "          //  insertion rate = deletion rate = 0.1")
+                continue
+            
+            if "EVOLVE" in line:
+                #write the line, write how many files we want as output
+                #and then continue
+                f.write(line + "\n")
+                for n in range(2, num_output_files + 1):
+                    f.write("partitionname 1 output" + str(n) + "\n")
+                continue
+            
             f.write(line + "\n")
-            for n in range(2, num_output_files + 1):
-                f.write("partitionname 1 output" + str(n) + "\n")
-            continue
+            
+    f.close()
         
-        f.write(line + "\n")
+    
+    #Run Indelible.
+    print("# Running INDELible")
+    subprocess.run("./indelible")
         
-f.close()
     
-
-#Run Indelible.
-print("# Running INDELible")
-subprocess.run("./indelible")
+    #once this is ran,
+    #copy the output files to a folder with the indel rate
     
-
-#once this is ran,
-#copy the output files to a folder with the indel rate
-
-subprocess.run(["mkdir", "0_1"])
-#subprocess.run(["mv", "*.phy", "0_1"], shell=True)
-#subprocess.run(["mv", "*.fas", "0_1/"], shell=True)
-
-subprocess.run(["mv *.phy 0_1"], shell=True)
-subprocess.run(["mv *.fas 0_1"], shell=True)
+    folder = str(RATE).replace(".", "_")
+    
+    subprocess.run(["mkdir", folder])
+    #subprocess.run(["mv", "*.phy", "0_1"], shell=True)
+    #subprocess.run(["mv", "*.fas", "0_1/"], shell=True)
+    
+    subprocess.run(["mv *.phy " + folder], shell=True)
+    subprocess.run(["mv *.fas " + folder], shell=True)
+    
+# =============================================================================
+# Main
+# =============================================================================
+    
+for rate in INDEL_RATE:
+    main(rate)
 
 # =============================================================================
 #  End of file
