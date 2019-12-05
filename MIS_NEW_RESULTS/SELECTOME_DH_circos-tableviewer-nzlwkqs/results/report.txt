@@ -1,0 +1,31 @@
+debuggroup summary 0.15s welcome to circos v0.68-pre1 7 Apr 2015 on Perl 5.010000
+debuggroup summary 0.15s current working directory /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs
+debuggroup summary 0.15s command /home/martink/work/circos/svn-tags/circos-tableviewer//bin/circos -param random_string=nzlwkqs -conf /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs/etc/circos.conf
+debuggroup summary 0.15s guessing configuration file
+debuggroup summary 0.15s found conf file /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs/etc/circos.conf
+debuggroup summary 0.41s debug will appear for these features: output,summary
+debuggroup summary 0.41s bitmap output image results/circos-table-nzlwkqs-large.png
+debuggroup summary 0.41s SVG output image results/circos-table-nzlwkqs-large.svg
+debuggroup summary 0.41s parsing karyotype and organizing ideograms
+debuggroup summary 0.42s karyotype has 61 chromosomes of total size 179,575
+debuggroup summary 0.45s applying global and local scaling
+debuggroup summary 0.48s allocating image, colors and brushes
+debuggroup summary 1.45s drawing 61 ideograms of total size 179,575
+debuggroup summary 1.45s drawing highlights and ideograms
+debuggroup summary 1.45s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.45s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.46s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.46s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.46s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.46s process track_0 highlight /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs/data/row.txt
+debuggroup summary 1.98s process track_1 highlight /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs/data/col.txt
+debuggroup summary 2.91s process track_2 highlight /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs/data/all.txt
+debuggroup summary 3.16s process track_3 highlight /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs/data/cap.col.txt
+debuggroup summary 3.41s process track_4 highlight /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs/data/cap.row.txt
+debuggroup summary 17.18s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/link.conf
+debuggroup summary 17.18s process flow link /home/martink/www/htdocs/tableviewer/tmp/nzlwkqs/data/cells.txt
+debuggroup summary 17.96s drawing link flow z 0
+debuggroup summary 24.39s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/text.conf
+debuggroup output 24.39s generating output
+debuggroup output 24.96s created PNG image results/circos-table-nzlwkqs-large.png (4542 kb)
+debuggroup output 24.98s created SVG image results/circos-table-nzlwkqs-large.svg (3974 kb)
