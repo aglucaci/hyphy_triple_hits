@@ -1,0 +1,31 @@
+debuggroup summary 0.24s welcome to circos v0.68-pre1 7 Apr 2015 on Perl 5.010000
+debuggroup summary 0.24s current working directory /home/martink/www/htdocs/tableviewer/tmp/ctxglau
+debuggroup summary 0.24s command /home/martink/work/circos/svn-tags/circos-tableviewer//bin/circos -param random_string=ctxglau -conf /home/martink/www/htdocs/tableviewer/tmp/ctxglau/etc/circos.conf
+debuggroup summary 0.24s guessing configuration file
+debuggroup summary 0.24s found conf file /home/martink/www/htdocs/tableviewer/tmp/ctxglau/etc/circos.conf
+debuggroup summary 0.49s debug will appear for these features: output,summary
+debuggroup summary 0.49s bitmap output image results/circos-table-ctxglau-large.png
+debuggroup summary 0.49s SVG output image results/circos-table-ctxglau-large.svg
+debuggroup summary 0.49s parsing karyotype and organizing ideograms
+debuggroup summary 0.50s karyotype has 61 chromosomes of total size 22,865
+debuggroup summary 0.53s applying global and local scaling
+debuggroup summary 0.56s allocating image, colors and brushes
+debuggroup summary 1.24s drawing 61 ideograms of total size 22,865
+debuggroup summary 1.24s drawing highlights and ideograms
+debuggroup summary 1.25s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.25s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.25s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.25s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.25s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.25s process track_0 highlight /home/martink/www/htdocs/tableviewer/tmp/ctxglau/data/row.txt
+debuggroup summary 1.47s process track_1 highlight /home/martink/www/htdocs/tableviewer/tmp/ctxglau/data/col.txt
+debuggroup summary 1.69s process track_2 highlight /home/martink/www/htdocs/tableviewer/tmp/ctxglau/data/all.txt
+debuggroup summary 1.93s process track_3 highlight /home/martink/www/htdocs/tableviewer/tmp/ctxglau/data/cap.col.txt
+debuggroup summary 2.15s process track_4 highlight /home/martink/www/htdocs/tableviewer/tmp/ctxglau/data/cap.row.txt
+debuggroup summary 13.50s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/link.conf
+debuggroup summary 13.50s process flow link /home/martink/www/htdocs/tableviewer/tmp/ctxglau/data/cells.txt
+debuggroup summary 14.22s drawing link flow z 0
+debuggroup summary 19.97s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/text.conf
+debuggroup output 19.97s generating output
+debuggroup output 20.57s created PNG image results/circos-table-ctxglau-large.png (4324 kb)
+debuggroup output 20.60s created SVG image results/circos-table-ctxglau-large.svg (3621 kb)
