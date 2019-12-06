@@ -1,0 +1,31 @@
+debuggroup summary 0.30s welcome to circos v0.68-pre1 7 Apr 2015 on Perl 5.010000
+debuggroup summary 0.30s current working directory /home/martink/www/htdocs/tableviewer/tmp/sadhikf
+debuggroup summary 0.30s command /home/martink/work/circos/svn-tags/circos-tableviewer//bin/circos -param random_string=sadhikf -conf /home/martink/www/htdocs/tableviewer/tmp/sadhikf/etc/circos.conf
+debuggroup summary 0.30s guessing configuration file
+debuggroup summary 0.30s found conf file /home/martink/www/htdocs/tableviewer/tmp/sadhikf/etc/circos.conf
+debuggroup summary 0.79s debug will appear for these features: output,summary
+debuggroup summary 0.79s bitmap output image results/circos-table-sadhikf-large.png
+debuggroup summary 0.79s SVG output image results/circos-table-sadhikf-large.svg
+debuggroup summary 0.79s parsing karyotype and organizing ideograms
+debuggroup summary 0.80s karyotype has 61 chromosomes of total size 4,223
+debuggroup summary 0.83s applying global and local scaling
+debuggroup summary 0.86s allocating image, colors and brushes
+debuggroup summary 1.57s drawing 61 ideograms of total size 4,223
+debuggroup summary 1.57s drawing highlights and ideograms
+debuggroup summary 1.58s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.58s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.58s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.58s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.58s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.58s process track_0 highlight /home/martink/www/htdocs/tableviewer/tmp/sadhikf/data/row.txt
+debuggroup summary 1.69s process track_1 highlight /home/martink/www/htdocs/tableviewer/tmp/sadhikf/data/col.txt
+debuggroup summary 1.79s process track_2 highlight /home/martink/www/htdocs/tableviewer/tmp/sadhikf/data/all.txt
+debuggroup summary 1.94s process track_3 highlight /home/martink/www/htdocs/tableviewer/tmp/sadhikf/data/cap.col.txt
+debuggroup summary 2.04s process track_4 highlight /home/martink/www/htdocs/tableviewer/tmp/sadhikf/data/cap.row.txt
+debuggroup summary 9.49s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/link.conf
+debuggroup summary 9.49s process flow link /home/martink/www/htdocs/tableviewer/tmp/sadhikf/data/cells.txt
+debuggroup summary 9.98s drawing link flow z 0
+debuggroup summary 12.62s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/text.conf
+debuggroup output 12.62s generating output
+debuggroup output 13.13s created PNG image results/circos-table-sadhikf-large.png (3691 kb)
+debuggroup output 13.14s created SVG image results/circos-table-sadhikf-large.svg (1825 kb)
