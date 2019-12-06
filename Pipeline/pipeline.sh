@@ -13,19 +13,20 @@ echo "WD: "$(pwd)
 
 BASEDIRECTORY="/Users/alex/Documents/MIS_NEW_RESULTS"
 
-TAG="SELECTOME"
-FITTERS="/Users/alex/Documents/MIS_NEW_RESULTS/"$TAG
+TAG="PETROV"
+FITTERS="/Users/alex/Documents/MIS_NEW_RESULTS/Data/"$TAG
 
 CSVFILE=$TAG"_SRV_nr.csv"
 CSVFILEV02=$TAG"_SRV_nr_v02.csv"
+
 CIRCOSTEXTFILE1="CIRCOS_"$TAG"_SRV_TH_nr.txt"
 
 #This is all TH's thresholded for THvsDH LRT  p value 0.05
 CIRCOSTEXTFILE2="CIRCOS_"$TAG"_SRV_nr_Thresholded_p0_05.txt"
 
-CIRCOSTEXTFILE3=CIRCOSTEXTFILE1="CIRCOS_"$TAG"_SRV_DH_nr.txt"
+CIRCOSTEXTFILE3="CIRCOS_"$TAG"_SRV_DH_nr.txt"
 
-OUTPUT_FOLDER=$BASEDIRECTORY"/"$TAG"_SRV_nr"
+OUTPUT_FOLDER=$BASEDIRECTORY"/Analysis/"$TAG"_SRV_nr"
 
 
 #TAG=""
@@ -75,14 +76,13 @@ echo "    Logfile: "$OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data_p
 # ==============================================================================
 # pipeline_circos_grab_site_substitution_data.py <FITTERS DIRECTORY> <OUTPUTTXT>
 # ==============================================================================
-echo "(1.2) Running: pipeline_circos_grab_site_substitution_data.py"
-echo "    Saving to: "$OUTPUT_FOLDER/$CIRCOSTEXTFILE1
-echo "    Logfile: "$OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data.txt
+echo ""
+echo "(1.2) Running: pipeline_circos_grab_site_substitution_data_DH.py"
+echo "    Saving to: "$OUTPUT_FOLDER/$CIRCOSTEXTFILE3
+echo "    Logfile: "$OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data_DH.txt
 
-#rm -f $OUTPUT_FOLDER/$CIRCOSTEXTFILE
-#[[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE ]] ||
-[[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE1 ]] || python pipeline_circos_grab_site_substitution_data.py $FITTERS $OUTPUT_FOLDER/$CIRCOSTEXTFILE1 10000 > $OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data.txt
-#python pipeline_circos_grab_site_substitution_data.py $FITTERS $OUTPUT_FOLDER/$CIRCOSTEXTFILE
+[[ -e $OUTPUT_FOLDER/$CIRCOSTEXTFILE3 ]] || python pipeline_circos_grab_site_substitution_data_DH.py $FITTERS $OUTPUT_FOLDER/$CIRCOSTEXTFILE3 > $OUTPUT_FOLDER/pipeline_circos_grab_site_substitution_data_DH.txt
+
 
 # ==============================================================================
 # pipeline_parse_fitter_json.py <FITTERS DIRECTORY> <OUTPUTCSV>
