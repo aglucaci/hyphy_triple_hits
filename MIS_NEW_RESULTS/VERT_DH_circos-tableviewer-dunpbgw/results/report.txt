@@ -1,0 +1,31 @@
+debuggroup summary 0.11s welcome to circos v0.68-pre1 7 Apr 2015 on Perl 5.010000
+debuggroup summary 0.11s current working directory /home/martink/www/htdocs/tableviewer/tmp/dunpbgw
+debuggroup summary 0.11s command /home/martink/work/circos/svn-tags/circos-tableviewer//bin/circos -param random_string=dunpbgw -conf /home/martink/www/htdocs/tableviewer/tmp/dunpbgw/etc/circos.conf
+debuggroup summary 0.11s guessing configuration file
+debuggroup summary 0.11s found conf file /home/martink/www/htdocs/tableviewer/tmp/dunpbgw/etc/circos.conf
+debuggroup summary 0.36s debug will appear for these features: output,summary
+debuggroup summary 0.37s bitmap output image results/circos-table-dunpbgw-large.png
+debuggroup summary 0.37s SVG output image results/circos-table-dunpbgw-large.svg
+debuggroup summary 0.37s parsing karyotype and organizing ideograms
+debuggroup summary 0.38s karyotype has 62 chromosomes of total size 2,416
+debuggroup summary 0.41s applying global and local scaling
+debuggroup summary 0.43s allocating image, colors and brushes
+debuggroup summary 1.10s drawing 62 ideograms of total size 2,416
+debuggroup summary 1.10s drawing highlights and ideograms
+debuggroup summary 1.10s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.10s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.10s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.10s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.10s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/highlight.bg.conf
+debuggroup summary 1.10s process track_0 highlight /home/martink/www/htdocs/tableviewer/tmp/dunpbgw/data/row.txt
+debuggroup summary 1.18s process track_1 highlight /home/martink/www/htdocs/tableviewer/tmp/dunpbgw/data/col.txt
+debuggroup summary 1.26s process track_2 highlight /home/martink/www/htdocs/tableviewer/tmp/dunpbgw/data/all.txt
+debuggroup summary 1.36s process track_3 highlight /home/martink/www/htdocs/tableviewer/tmp/dunpbgw/data/cap.col.txt
+debuggroup summary 1.44s process track_4 highlight /home/martink/www/htdocs/tableviewer/tmp/dunpbgw/data/cap.row.txt
+debuggroup summary 8.42s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/link.conf
+debuggroup summary 8.42s process flow link /home/martink/www/htdocs/tableviewer/tmp/dunpbgw/data/cells.txt
+debuggroup summary 8.67s drawing link flow z 0
+debuggroup summary 10.66s found conf file /home/martink/work/circos/svn-tags/circos-0.68-pre1/bin/../etc/tracks/text.conf
+debuggroup output 10.66s generating output
+debuggroup output 11.17s created PNG image results/circos-table-dunpbgw-large.png (3637 kb)
+debuggroup output 11.18s created SVG image results/circos-table-dunpbgw-large.svg (1438 kb)
