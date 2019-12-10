@@ -80,8 +80,8 @@ def read_json(filename):
         this_row.append(json_data["test results"]["Triple-hit-island vs double-hit"]["p-value"])
 
         #"MG94 with double and triple instantaneous substitutions" [ISLANDS]
-        this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["AIC-c_MG94xSI"])
-        this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Log Likelihood_MG94xSI"])
+        this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["AIC-c"])
+        this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Log Likelihood"])
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Rate Distributions"]["parameters"]["Substitution rate from nucleotide A to nucleotide C"])
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Rate Distributions"]["parameters"]["Substitution rate from nucleotide A to nucleotide G"])
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Rate Distributions"]["parameters"]["Substitution rate from nucleotide A to nucleotide T"])
