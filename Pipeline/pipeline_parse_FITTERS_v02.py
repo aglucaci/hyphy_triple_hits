@@ -10,6 +10,8 @@ Created on Fri Feb 22 11:49:59 2019
 6/2019: Modified to handle the output from the FitMultiModel with SRV added.
 
 10/2019: Added support for v0.2 Fitters
+
+12/2019: Sadie changed some column headers
 """
 
 # =============================================================================
@@ -50,12 +52,12 @@ def sum_branchlengths(branch_attributes, model):
 
 def report_branchlengths(branch_attributes, model):
     taxa_bl_dict = {}
-    
+
     for key in branch_attributes.keys():
         taxa_bl_dict[key] = branch_attributes[key][model]
-    
+
     return taxa_bl_dict
-        
+
 
 def read_json(filename):
     this_row = []
@@ -65,7 +67,7 @@ def read_json(filename):
         this_row.append(json_data["input"]["file name"].split("/")[-1])
         this_row.append(json_data["input"]["number of sequences"])
         this_row.append(json_data["input"]["number of sites"])
-        
+
         this_row.append(json_data["test results"]["Double-hit vs single-hit"]["LRT"])
         this_row.append(json_data["test results"]["Double-hit vs single-hit"]["p-value"])
         this_row.append(json_data["test results"]["Triple-hit vs double-hit"]["LRT"])
@@ -76,10 +78,10 @@ def read_json(filename):
         this_row.append(json_data["test results"]["Triple-hit vs Triple-hit-island"]["p-value"])
         this_row.append(json_data["test results"]["Triple-hit-island vs double-hit"]["LRT"])
         this_row.append(json_data["test results"]["Triple-hit-island vs double-hit"]["p-value"])
-        
+
         #"MG94 with double and triple instantaneous substitutions" [ISLANDS]
-        this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["AIC-c"])
-        this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Log Likelihood"])
+        this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["AIC-c_MG94xSI"])
+        this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Log Likelihood_MG94xSI"])
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Rate Distributions"]["parameters"]["Substitution rate from nucleotide A to nucleotide C"])
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Rate Distributions"]["parameters"]["Substitution rate from nucleotide A to nucleotide G"])
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Rate Distributions"]["parameters"]["Substitution rate from nucleotide A to nucleotide T"])
@@ -97,7 +99,7 @@ def read_json(filename):
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Rate Distributions"]["parameters"]["Mixture auxiliary weight for GDD category 2"])
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions [only synonymous islands]"]["Rate Distributions"]["distribution"])
 
-        
+
 
         #"MG94 with double and triple instantaneous substitutions"
         this_row.append(json_data["fits"]["MG94 with double and triple instantaneous substitutions"]["AIC-c"])
@@ -162,23 +164,23 @@ def read_json(filename):
         DH_TL = sum_branchlengths(TREE_data, "MG94 with double instantaneous substitutions")
         #Single hit tree length
         SH_TL = sum_branchlengths(TREE_data, "Standard MG94")
-        
+
         #print(TH_TL, DH_TL, SH_TL)
         this_row.append(TH_TL)
         this_row.append(DH_TL)
         this_row.append(SH_TL)
-        
-        
+
+
         #Branch attributes
         TH_BA = report_branchlengths(TREE_data, "MG94 with double and triple instantaneous substitutions")
         DH_BA = report_branchlengths(TREE_data, "MG94 with double and triple instantaneous substitutions")
         SH_BA = report_branchlengths(TREE_data, "Standard MG94")
-        
+
         #print(TH_BA)
         this_row.append(TH_BA)
         this_row.append(DH_BA)
         this_row.append(SH_BA)
-                
+
     fh.close()
     writeto_csv(filename, this_row)
 
@@ -199,7 +201,7 @@ def writeto_csv(filename, this_row):
 columns = ["File name", "number of sequences", "number of sites"]
 
 #Test results, model comparisons via LRT
-columns += ["Double-hit vs single-hit - LRT", "Double-hit vs single-hit - p-value"] 
+columns += ["Double-hit vs single-hit - LRT", "Double-hit vs single-hit - p-value"]
 columns += ["Triple-hit vs double-hit - LRT", "Triple-hit vs double-hit - p-value"]
 columns += ["Triple-hit vs single-hit - LRT",  "Triple-hit vs single-hit - p-value"]
 columns += ["Triple-hit vs Triple-hit-island - LRT", "Triple-hit vs Triple-hit-island - p-value"]
@@ -208,33 +210,33 @@ columns += ["Triple-hit-island vs double-hit - LRT", "Triple-hit-island vs doubl
 
 #TH Model Islands
 columns += ["MG94 with double and triple instantaneous substitutions [ISLANDS]- AIC-c", "MG94 with double and triple instantaneous substitutions [ISLANDS] - Log Likelihood"]
-columns += ["Substitution rate from nucleotide A to nucleotide C", "Substitution rate from nucleotide A to nucleotide G", "Substitution rate from nucleotide A to nucleotide T","Substitution rate from nucleotide C to nucleotide G","Substitution rate from nucleotide C to nucleotide T","Substitution rate from nucleotide G to nucleotide T"]
-columns += ["non-synonymous/synonymous rate ratio", "rate at which 2 nucleotides are changed instantly within a single codon", "rate at which 3 nucleotides are changed instantly within a single codon"]
-columns += ["rate at which 3 nucleotides are changed instantly within a single codon between synonymous codon islands"]
-columns += ["GDD rate category 1.triple", "GDD rate category 2.triple", "GDD rate category 3.triple","Mixture auxiliary weight for GDD category 1.triple", "Mixture auxiliary weight for GDD category 2.triple"]
-columns += ["distribution.triple"]
+columns += ["Substitution rate from nucleotide A to nucleotide C_MG94xSI", "Substitution rate from nucleotide A to nucleotide G_MG94xSI", "Substitution rate from nucleotide A to nucleotide T_MG94xSI","Substitution rate from nucleotide C to nucleotide G_MG94xSI","Substitution rate from nucleotide C to nucleotide T_MG94xSI","Substitution rate from nucleotide G to nucleotide T_MG94xSI"]
+columns += ["non-synonymous/synonymous rate ratio_MG94xSI", "rate at which 2 nucleotides are changed instantly within a single codon_MG94xSI", "rate at which 3 nucleotides are changed instantly within a single codon_MG94xSI"]
+columns += ["rate at which 3 nucleotides are changed instantly within a single codon between synonymous codon islands_MG94xSI"]
+columns += ["GDD rate category 1_MG94xSI", "GDD rate category 2_MG94xSI", "GDD rate category 3_MG94xSI","Mixture auxiliary weight for GDD category 1_MG94xSI", "Mixture auxiliary weight for GDD category 2_MG94xSI"]
+columns += ["distribution_MG94xSI"]
 
 #TH Model
 columns += ["MG94 with double and triple instantaneous substitutions - AIC-c", "MG94 with double and triple instantaneous substitutions - Log Likelihood"]
-columns += ["Substitution rate from nucleotide A to nucleotide C", "Substitution rate from nucleotide A to nucleotide G", "Substitution rate from nucleotide A to nucleotide T","Substitution rate from nucleotide C to nucleotide G","Substitution rate from nucleotide C to nucleotide T","Substitution rate from nucleotide G to nucleotide T"]
-columns += ["non-synonymous/synonymous rate ratio", "rate at which 2 nucleotides are changed instantly within a single codon", "rate at which 3 nucleotides are changed instantly within a single codon"]
-columns += ["rate at which 3 nucleotides are changed instantly within a single codon between synonymous codon islands"]
-columns += ["GDD rate category 1.triple", "GDD rate category 2.triple", "GDD rate category 3.triple","Mixture auxiliary weight for GDD category 1.triple", "Mixture auxiliary weight for GDD category 2.triple"]
-columns += ["distribution.triple"]
+columns += ["Substitution rate from nucleotide A to nucleotide C_MG94x3", "Substitution rate from nucleotide A to nucleotide G_MG94x3", "Substitution rate from nucleotide A to nucleotide T_MG94x3","Substitution rate from nucleotide C to nucleotide G_MG94x3","Substitution rate from nucleotide C to nucleotide T_MG94x3","Substitution rate from nucleotide G to nucleotide T_MG94x3"]
+columns += ["non-synonymous/synonymous rate ratio_MG94x3", "rate at which 2 nucleotides are changed instantly within a single codon_MG94x3", "rate at which 3 nucleotides are changed instantly within a single codon_MG94x3"]
+columns += ["rate at which 3 nucleotides are changed instantly within a single codon between synonymous codon islands_MG94x3"]
+columns += ["GDD rate category 1_MG94x3", "GDD rate category 2_MG94x3", "GDD rate category 3_MG94x3","Mixture auxiliary weight for GDD category 1_MG94x3", "Mixture auxiliary weight for GDD category 2_MG94x3"]
+columns += ["distribution_MG94x3"]
 
 #DH Model
 columns += ["MG94 with double instantaneous substitutions - AIC-c", "MG94 with double instantaneous substitutions - Log Likelihood"]
-columns += ["Substitution rate from nucleotide A to nucleotide C", "Substitution rate from nucleotide A to nucleotide G", "Substitution rate from nucleotide A to nucleotide T","Substitution rate from nucleotide C to nucleotide G","Substitution rate from nucleotide C to nucleotide T","Substitution rate from nucleotide G to nucleotide T"]
-columns += ["non-synonymous/synonymous rate ratio", "rate at which 2 nucleotides are changed instantly within a single codon"]
-columns += ["GDD rate category 1.double", "GDD rate category 2.double", "GDD rate category 3.double","Mixture auxiliary weight for GDD category 1.double", "Mixture auxiliary weight for GDD category 2.double"]
-columns += ["distribution.double"]
+columns += ["Substitution rate from nucleotide A to nucleotide C_MG94x2", "Substitution rate from nucleotide A to nucleotide G_MG94x2", "Substitution rate from nucleotide A to nucleotide T_MG94x2","Substitution rate from nucleotide C to nucleotide G_MG94x2","Substitution rate from nucleotide C to nucleotide T_MG94x2","Substitution rate from nucleotide G to nucleotide T_MG94x2"]
+columns += ["non-synonymous/synonymous rate ratio_MG94x2", "rate at which 2 nucleotides are changed instantly within a single codon_MG94x2"]
+columns += ["GDD rate category 1_MG94x2", "GDD rate category 2_MG94x2", "GDD rate category 3_MG94x2","Mixture auxiliary weight for GDD category 1_MG94x2", "Mixture auxiliary weight for GDD category 2_MG94x2"]
+columns += ["distribution_MG94x2"]
 
 #SH Model
 columns += ["Standard MG94 - AIC-c", "Standard MG94 - Log Likelihood"]
-columns += ["Substitution rate from nucleotide A to nucleotide C", "Substitution rate from nucleotide A to nucleotide G", "Substitution rate from nucleotide A to nucleotide T","Substitution rate from nucleotide C to nucleotide G","Substitution rate from nucleotide C to nucleotide T","Substitution rate from nucleotide G to nucleotide T"]
-columns += ["non-synonymous/synonymous rate ratio"]
-columns += ["GDD rate category 1.single", "GDD rate category 2.single", "GDD rate category 3.single","Mixture auxiliary weight for GDD category 1.single", "Mixture auxiliary weight for GDD category 2.single"]
-columns += ["distribution.single"]
+columns += ["Substitution rate from nucleotide A to nucleotide C_MG94", "Substitution rate from nucleotide A to nucleotide G_MG94", "Substitution rate from nucleotide A to nucleotide T_MG94","Substitution rate from nucleotide C to nucleotide G_MG94","Substitution rate from nucleotide C to nucleotide T_MG94","Substitution rate from nucleotide G to nucleotide T_MG94"]
+columns += ["non-synonymous/synonymous rate ratio_MG94"]
+columns += ["GDD rate category 1_MG94", "GDD rate category 2_MG94", "GDD rate category 3_MG94","Mixture auxiliary weight for GDD category 1_MG94", "Mixture auxiliary weight for GDD category 2_MG94"]
+columns += ["distribution_MG94"]
 
 #Branches
 columns += ["Tree Length - MG94 with double and triple instantaneous substitutions", "Tree Length - MG94 with double instantaneous substitutions", "Tree Length - Standard MG94"]
