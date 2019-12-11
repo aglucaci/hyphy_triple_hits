@@ -1,0 +1,187 @@
+---
+title: "Functional correlates"
+author: "sadie"
+date: "12/10/2019"
+output: html_document
+---
+
+
+```{r, message=FALSE, warning=FALSE,}
+#set up libraries
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(reshape2)
+library(cowplot)
+
+#read in source of fraction under selection functions
+#source("/Volumes/GoogleDrive/My Drive/BUSTED-SRV/R/useful_functions.R")
+```
+
+```{r load libraries and data, message=FALSE, warning=FALSE, cache=TRUE}
+#read in selectome data
+
+selectome.dat <- read_csv("~/Downloads/selectome_results_FMM.csv")
+```
+
+first lets just do p values vs seq length, number of sequences, dn/ds ratio, maybe tree lengths 
+```{r}
+
+#transform data using melt so that all the p-values are in one column so that we can use that to color or plot on facets.
+
+selectome.dat %>% melt(id.vars = c("number of sequences", "number of sites"), measure.vars = c("Double-hit vs single-hit - p-value", "Triple-hit vs single-hit - p-value","Triple-hit vs double-hit - p-value")) %>% ggplot()+ geom_point(aes(x = `number of sequences`, y = value))+ facet_grid(.~variable)
+```
+this ends up being very messy and low information. Let's try binning the values.
+
+the detection_bin and dep_bin functions are modified from some BUSTED[S] code
+
+```{r}
+#these function determine the bins and fraction of them under selection for a variable key in data dat 
+detection_bin_DHvSH <- function (x, y, key, dat) {
+  sb <- dat
+  i = sb$`Double-hit vs single-hit - p-value`[sb[key] >= x & sb[key] < y]; # get values between x and y for variable key
+  l = length (i);  #get the length of i
+  percent <- length(i[i<=0.05])/l #get the percent of the values from key that have a p-value <= 0.05
+  #if (l >= 100) return (percent);
+  if (l >= 100) return (list(frac=percent,count =l)); #if l is greater than 100 add the percent and count to list 
+  return (NA); 
+};
+
+detection_bin_THvSH <- function (x, y, key, dat) {  
+  sb <- dat
+  i = sb$`Triple-hit vs single-hit - p-value`[sb[key] >= x & sb[key] < y]; 
+  l = length (i); 
+  percent <- length(i[i<=0.05])/l
+  if (l >= 100) return (list(frac=percent,count =l)); 
+  return (NA); 
+};
+
+detection_bin_THvDH <- function (x, y, key, dat) {  
+  sb <- dat
+  i = sb$`Triple-hit vs double-hit - p-value`[sb[key] >= x & sb[key] < y]; 
+  l = length (i); 
+  percent <- length(i[i<=0.05])/l
+  if (l >= 100) return (list(frac=percent,count =l)); 
+  return (NA); 
+};
+
+
+
+n <-'number of sites'
+l <- 'Codons'
+panel <-'C'
+step <- 50
+from <-50
+to <- 3000
+i <- 1
+
+ #this runs the above functions and creates a plot
+#n is a column/variable name
+#l is what you want the x-axis to be labelled. mostly because column names tend to be weird
+# panel is what panel the plot is if it is part of an array of plots (useful for like cowplot)
+# step is the step value for each bin
+#from is the start value for the bins
+#to is the end value for the bins
+#data is the data frame that contains n
+
+dep_bin <- function (n,l,panel,step,from, to, data) {
+  #setting up empty vectors for each p value type
+  x.DHvSH=c(); 
+  y.DHvSH=c(); 
+  z.DHvSH=c();
+  x.THvSH=c(); 
+  y.THvSH=c();
+  z.THvSH=c();
+  x.THvDH=c(); 
+  y.THvDH=c();
+  z.THvDH=c();
+  last_valid = from;
+  #loop over the variable n and create bins with fraction under selection for double v single hit p value
+  for (i in seq (from,to,by=step)){
+    d.DHvSH=detection_bin_DHvSH(last_valid,i+step,n, data); 
+    #print (c(last_valid, i+step));
+    if (! is.na (d.DHvSH)) {x.DHvSH<-c(x.DHvSH,(last_valid+i+step)/2);
+                             y.DHvSH<-c(y.DHvSH,d.DHvSH$frac); 
+                             last_valid = i+step;
+                             z.DHvSH<-c(z.DHvSH, d.DHvSH$count);}
+  }; 
+  #loop over the variable n and create bins with fraction under selection for triple v single hit p value
+  last_valid = from;
+  for (i in seq (from,to,by=step)){
+    d.THvSH=detection_bin_THvSH(last_valid,i+step,n, data); 
+    #print (c(last_valid, i+step));
+    if (! is.na (d.THvSH)) {x.THvSH<-c(x.THvSH,(last_valid+i+step)/2);
+                             y.THvSH<-c(y.THvSH,d.THvSH$frac); 
+                             last_valid = i+step;
+                             z.THvSH<-c(z.THvSH, d.THvSH$count);}
+  }; 
+  #loop over the variable n and create bins with fraction under selection for triple v double hit p value
+  last_valid = from;
+  for (i in seq (from,to,by=step)){
+    d.THvDH=detection_bin_THvDH(last_valid,i+step,n, data); 
+    #print (c(last_valid, i+step));
+    if (! is.na (d.THvDH)) {x.THvDH<-c(x.THvDH,(last_valid+i+step)/2);
+                             y.THvDH<-c(y.THvDH,d.THvDH$frac); 
+                             last_valid = i+step;
+                             z.THvDH<-c(z.THvDH, d.THvDH$count);}
+  }; 
+  
+  #plot each set of bins as points with size weighted by the number of enteries in each bin and loess smoothed lines
+  
+ggplot()+geom_point(aes(x.DHvSH, y.DHvSH, color = 'DHvSH', size = z.DHvSH))+
+    geom_smooth(aes(x.DHvSH, y.DHvSH, color = 'DHvSH', weight =z.DHvSH), method = loess, se = FALSE) +
+    geom_point(aes(x.THvSH, y.THvSH, color = 'THvSH', , size = z.THvSH))+ 
+    geom_smooth(aes(x.THvSH, y.THvSH, color = 'THvSH', weight = z.THvSH), method = loess, se = FALSE) +
+    geom_point(aes(x.THvDH, y.THvDH, color = 'THvDH', , size = z.THvDH))+ 
+    geom_smooth(aes(x.THvDH, y.THvDH, color = 'THvDH', weight = z.THvDH), method = loess, se = FALSE) + 
+    xlab(l) +
+    ylab("Fraction under selection")+ 
+    labs(color = "")
+  
+  
+
+};
+```
+
+```{r}
+#run dep_bin to get fraction under selection plots for codons
+g1 <- dep_bin ('number of sites','Codons','A', 50,50,3000, selectome.dat) + scale_color_grey() + guides(color = FALSE, size = FALSE);
+
+#get legend to use later for cowplot's plot_grid
+leg <- get_legend(g1 + guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "bottom"))
+
+
+
+g2 <- dep_bin ('number of sequences','Sequences','B', 4,9,125, selectome.dat)+ scale_color_grey() + labs(y = "") + guides(color = FALSE, size = FALSE);
+
+g3 <- dep_bin ('Tree Length - MG94 with double and triple instantaneous substitutions','TL via MG94x3', 'C', 0.1, 0, 5.0, selectome.dat) + scale_color_grey() + guides(color = FALSE, size = FALSE);
+```
+
+```{r}
+#plot the 3 previous plots in one uniform row
+prow <- plot_grid( g1, g2, g3, ncol = 3)
+#add a bottom legend to the plots
+plot_grid(prow, leg, ncol = 1, rel_heights = c(1, .1))
+```
+```{r}
+#generate some more plots
+g4 <- dep_bin ('rate at which 3 nucleotides are changed instantly within a single codon_MG94x3','TH est. MG94x3', 'C', 0.01, 0, 2, selectome.dat) + scale_color_grey() + guides(color = FALSE, size = FALSE);
+
+g5 <- dep_bin ('non-synonymous/synonymous rate ratio_MG94','omega MG94', 'C', 0.1, 0, 60, selectome.dat) + scale_color_grey() + guides(color = FALSE, size = FALSE);
+
+g6 <- dep_bin ('non-synonymous/synonymous rate ratio_MG94x2','omega MG94x2', 'C', 0.1, 0, 60, selectome.dat) + scale_color_grey() + guides(color = FALSE, size = FALSE);
+
+g7 <- dep_bin ('non-synonymous/synonymous rate ratio_MG94x3','omega MG94x3', 'C', 0.1, 0, 60, selectome.dat) + scale_color_grey() + guides(color = FALSE, size = FALSE);
+
+g8 <- dep_bin ('non-synonymous/synonymous rate ratio_MG94xSI','omega MG94xSI', 'C', 0.1, 0, 60, selectome.dat) + scale_color_grey() + guides(color = FALSE, size = FALSE);
+```
+```{r}
+#can use the same legend and method to plot all the omega estimates
+prow <- plot_grid( g5, g6, g7, g8, ncol = 4)
+
+plot_grid(prow, leg, ncol = 1, rel_heights = c(1, .1))
+```
+

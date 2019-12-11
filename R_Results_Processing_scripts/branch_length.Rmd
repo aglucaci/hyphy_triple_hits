@@ -1,0 +1,216 @@
+---
+title: "Untitled"
+author: "sadie"
+date: "9/20/2019"
+output: html_document
+---
+Here we're trying to compare branch length estimates across the three models, MG94, MG94x2, and MG94x3. This involves large datasets and just a lot of data clean up and formatting
+
+```{r, message=FALSE, warning=FALSE,}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(plotly)
+```
+
+```{r load libraries and data, message=FALSE, warning=FALSE, cache=TRUE}
+
+
+
+
+selectome.dat <- read_csv("~/Downloads/SELECTOME_TREELENGTHS_BRANCHLENGTHS.csv")
+
+sites.dat <- read_tsv("~/Downloads/SELECTOME_MUTATIONS_BRANCH_SITE.tsv")
+
+
+```
+## make file names matchable
+```{r, cache=TRUE}
+sites.dat$`File name` <- sites.dat$Filename %>% str_remove(., ".FITTER.json")
+```
+
+## create entry for individual branches
+```{r, cache=TRUE}
+library(tidyr)
+
+temp.1 <- sites.dat %>% separate_rows(.,Branch,sep =",")
+
+"{'0': 'PHLDB1_CAVPO'}" -> x
+
+temp.1$Branch <- temp.1$Branch %>% str_remove(., "\\{") %>% str_remove(., "\\}") %>% str_remove_all(., "'") %>% 
+  str_remove('[0-9]: ') %>% str_trim()
+```
+
+
+## put branch length estimates for each model in own column for each branch 
+## Lengthx1 - the branch length according to Standard MG94
+## Lengthx2 - the branch length according to the double hit MG94
+## Lengthx3 - the branch length according to the triple hit MG94
+```{r, cache=TRUE}
+attach(selectome.dat)
+temp.2 <- selectome.dat %>% separate_rows(., `Branch Attributes - MG94 with double and triple instantaneous substitutions`,`Branch Attributes - MG94 with double instantaneous substitutions`, `Branch Attributes - Standard MG94`, sep = ",")
+
+temp.2 <- temp.2 %>% separate(`Branch Attributes - MG94 with double and triple instantaneous substitutions`, c("Branchx3", "Lengthx3"), sep = ":", convert = TRUE)
+
+temp.2 <- temp.2 %>% separate(`Branch Attributes - MG94 with double instantaneous substitutions`, c("Branchx2", "Lengthx2"), sep = ":", convert = TRUE)
+
+temp.2 <- temp.2 %>% separate(`Branch Attributes - Standard MG94`, c("Branchx1", "Lengthx1"), sep = ":", convert = TRUE)
+
+
+temp.2$Branch <- temp.2$Branchx3 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\}") %>% str_trim()
+
+
+temp.2$Lengthx1 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\}") %>% str_trim() -> temp.2$Lengthx1
+
+temp.2$Lengthx2 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\}") %>% str_trim() -> temp.2$Lengthx2
+
+temp.2$Lengthx3 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\}") %>% str_trim() -> temp.2$Lengthx3
+```
+
+
+
+## combine data.frame with mutation type information with p value and other stats and parameter info data.frame
+## this is huge ~3GB (could remove some columns I don't immeadiately use)
+```{r}
+temp.3 <- right_join( temp.2, temp.1, by = c("File name","Branch"))
+
+
+#as.numeric(temp.3$Lengthx3) %>% is.na() %>% which()
+#temp.2$Lengthx3[14302]
+
+#temp.3 %>% select(`File name`, Branch, Lengthx1,Lengthx2, Lengthx3, `Mutation Type`, `Double-hit vs single-hit - p-value`,`Triple-hit vs single-hit - p-value`,`Triple-hit vs double-hit - p-value`) %>% write_csv(., "Branch_lengths_small.csv")
+#write_csv(temp.3, "Branch_lengths.csv")
+```
+
+
+
+```{r, eval=FALSE}
+temp.3 %>% ggplot(aes(x = as.numeric(Lengthx3), y = as.numeric(Lengthx1)))+geom_point(aes(color = `Mutation Type`))+coord_cartesian(xlim = c(0,1), ylim = c(0,1))
+```
+
+## create a data.frame with all the length estimates in one column for easier graph amking
+```{r, cache=TRUE}
+library(reshape2)
+ #temp.3 %>% select(`File name`, Branch, Lengthx1,Lengthx2, Lengthx3, `Mutation Type`)%>% head()
+temp.4 <- temp.3 %>% select(`File name`, Branch, Lengthx1,Lengthx2, Lengthx3, `Mutation Type`, `Double-hit vs single-hit - p-value`,`Triple-hit vs single-hit - p-value`,`Triple-hit vs double-hit - p-value`)  %>%  melt(id.vars = c("File name","Branch", "Mutation Type", "Double-hit vs single-hit - p-value","Triple-hit vs single-hit - p-value", "Triple-hit vs double-hit - p-value"), variable.name = "Length_by_Model", value.name = "Length_Est") 
+#write_csv(temp.4, "Branch_lengths_melted.csv")
+```
+
+## Boxplots of estimates branch length grouped by Model and colored by mutation type
+## Mutation type:
+## SH - a single hit mutation occur on the branch
+## DH - a double hit mutation occurred on the branch
+## TH - a triple hit mutation occured on the branch
+```{r}
+temp.4 %>% ggplot() + geom_boxplot(aes(x=Length_by_Model, y = as.numeric(Length_Est), color = `Mutation Type`))+ ylim(0,1)
+```
+## Boxplots of estimates branch length grouped by mutation type and colored by Model
+```{r}
+temp.4 %>% ggplot() + geom_boxplot(aes(x=`Mutation Type`, y = as.numeric(Length_Est), color = Length_by_Model))+ ylim(0,1)
+```
+
+## histograms with bin size 0.01 for DH and TH branch length distribution. SH not included because there are soooo many more of them. 
+```{r}
+temp.4 %>% filter(`Mutation Type` != "SH") %>%  ggplot() + geom_histogram(aes(x = as.numeric(Length_Est), y = (..count..)/sum(..count..), fill =Length_by_Model), position = "dodge", binwidth = 0.01)+ facet_grid(~`Mutation Type`, scales = "free_y")+ xlim(0,0.5)
+```
+
+
+## Frequency plots can see how many SH there are. I feel like these both show that all 3 models estimate length very closely and that all 3 substitution types have a similar distribution of branch lengths
+```{r}
+temp.4 %>% ggplot() + geom_freqpoly(aes(x =as.numeric(Length_Est), y = (..count..)/sum(..count..), color =Length_by_Model), position = "dodge", binwidth = 0.01)+ facet_grid(~`Mutation Type`)+ xlim(0,0.5)
+```
+
+
+## scatter plot for MG94x3 vs MG94x2 with p <= 0.05.  Line is x = y 
+```{r}
+temp.3 %>% filter(`Triple-hit vs double-hit - p-value` <= 0.05) %>% ggplot()+geom_point(aes(x = as.numeric(Lengthx3), y= as.numeric(Lengthx2), color = `Mutation Type`)) + coord_cartesian(xlim = c(0,5), ylim = c(0,5))+geom_abline(slope = 1, intercept = 0)
+```
+
+## scatter plot for MG94x3 vs MG94x1 with p <= 0.05.  Line is x = y 
+```{r}
+temp.3 %>% filter(`Triple-hit vs single-hit - p-value` <= 0.05) %>% ggplot()+geom_point(aes(x = as.numeric(Lengthx3), y= as.numeric(Lengthx1), color = `Mutation Type`)) + coord_cartesian(xlim = c(0,5), ylim = c(0,5)) + geom_abline(slope = 1, intercept = 0)+facet_grid(.~`Mutation Type`)
+
+```
+
+```{r}
+
+sh.branches <- temp.1 %>% filter(`Mutation Type` == "SH") 
+dh.branches <- temp.1 %>%  filter(`Mutation Type` == "DH")
+th.branches <- temp.1 %>% filter(`Mutation Type` == "TH")
+
+```
+
+which files have branches with single and double hits for the same file?
+```{r}
+sh.dh.files <- dh.branches$`File name`[which(paste(dh.branches$Branch, dh.branches$`File name`) %in% paste(sh.branches$Branch, sh.branches$`File name`))]
+
+sh.dh.files <- dh.branches$`File name`[which(paste(dh.branches$Branch, dh.branches$`File name`, dh.branches$`Site Position`) %in% paste(sh.branches$Branch, sh.branches$`File name`, sh.branches$`Site Position`))]
+```
+
+which files have branches with single and triple hits for the same file?
+
+```{r}
+sh.th.files <- th.branches$`File name`[which(paste(th.branches$Branch, th.branches$`File name`) %in% paste(sh.branches$Branch, sh.branches$`File name`))]
+
+sh.th.branches <- th.branches$Branch[which(paste(th.branches$Branch, th.branches$`File name`) %in% paste(sh.branches$Branch, sh.branches$`File name`))]
+```
+
+
+which files have branches with double and triple hits for the same file?
+
+```{r}
+dh.th.files <- th.branches$`File name`[which(paste(th.branches$Branch, th.branches$`File name`) %in% paste(dh.branches$Branch, dh.branches$`File name`))]
+
+dh.th.sites<- th.branches$`File name`[which(paste( th.branches$`File name`, th.branches$`Site Position`) %in% paste( dh.branches$`File name`, dh.branches$`Site Position`))]
+```
+
+want to compare sh value for branch to double hit value for the same branch
+
+```{r}
+u <- temp.3 %>% select(`File name`,`Triple-hit vs single-hit - p-value`, Lengthx1, Lengthx3,Branch) %>% filter(`File name` %in% sh.th.files, Branch %in% sh.th.branches) %>% mutate(diff.sh.th = as.numeric(Lengthx1) - as.numeric(Lengthx3), per.diff.sh.th = abs(as.numeric(Lengthx1) - as.numeric(Lengthx3))/as.numeric(Lengthx1)) 
+
+u %>% ggplot() + geom_histogram(aes(x= diff.sh.th)) + xlim(-0.005,0.05)
+
+u %>% ggplot() + geom_freqpoly(aes(x= per.diff.sh.th)) +xlim(0,0.2) 
+
+write_csv(u, "th_v_sh_branch_difs.csv")
+```
+
+#previous code
+```{r, eval=FALSE}
+
+output_withcol %>% filter(`Triple-hit vs double-hit - p-value`<=0.05) %>% ggplot(aes(x = `Tree Length - MG94 with double and triple instantaneous substitutions`, y = `rate at which 3 nucleotides are changed instantly within a single codon`))+geom_point()+coord_cartesian(xlim = c(0,10), ylim = c(0,10))
+
+
+output_withcol %>% filter(`Triple-hit vs double-hit - p-value`>0.05) %>% ggplot(aes(x = `Tree Length - MG94 with double and triple instantaneous substitutions`, y = `rate at which 3 nucleotides are changed instantly within a single codon`))+geom_point()+coord_cartesian(xlim = c(0,10), ylim = c(0,10))
+```
+
+```{r, eval=FALSE}
+output_withcol %>% filter(`Triple-hit vs double-hit - p-value`<=0.05) %>% select(`File name`)
+
+ temp <- output_withcol %>% filter(`Triple-hit vs double-hit - p-value`<=0.05, `File name` == "ENSGT00680000099768.Euteleostomi.004.nex") %>% select(`Branch Attributes - MG94 with double and triple instantaneous substitutions`, `Branch Attributes - MG94 with double instantaneous substitutions`) 
+
+temp$`Branch Attributes - MG94 with double and triple instantaneous substitutions`  %>% str_remove_all(.,"\\{") %>% str_remove_all(.,"\\}")%>% str_split(., ",") -> x
+
+x %>% lapply(., function(x) str_split(x, ":") ) %>% unlist -> x
+
+cols <-c("branch", "length.triple")
+
+matrix(unlist(x),ncol=2,byrow=TRUE, dimnames = list(NULL, cols)) -> temp.triple
+
+temp$`Branch Attributes - MG94 with double instantaneous substitutions`  %>% str_remove_all(.,"\\{") %>% str_remove_all(.,"\\}")%>% str_split(., ",") -> x
+
+x %>% lapply(., function(x) str_split(x, ":") ) %>% unlist -> x
+
+cols <-c("branch", "length.double")
+matrix(unlist(x),ncol=2,byrow=TRUE, dimnames = list(NULL, cols)) -> temp.double
+
+
+x <- full_join(as.data.frame(temp.double, stringsAsFactors = F), as.data.frame(temp.triple, stringsAsFactors = F), by = "branch")
+
+x[, 2:3] <- as.numeric(unlist(x[,2:3]))
+```
+
+
+
