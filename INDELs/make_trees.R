@@ -21,7 +21,7 @@ mat <- matrix(abs(rnorm(30, 2, 1.5))) # make branch length a distribution, <1 to
 #tree <- rtree(n = 30, rooted = TRUE, br = TRUE)
 
 #generic way to make tree
-tree <- rtree(n = 30, rooted = TRUE) #make the n a distribution like 10-50
+tree <- rtree(n = 20, rooted = TRUE) #make the n a distribution like 10-50
 
 #plot the tree
 plot(tree, edge.width = 2)

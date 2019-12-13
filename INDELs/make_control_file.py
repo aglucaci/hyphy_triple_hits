@@ -14,6 +14,9 @@ Generate codon simulations with indel variation.
 import os
 import subprocess
 
+# 20 taxa
+newick_tree = "(((t5:0.8387175682,(t15:0.5062256691,t20:0.4268791114):0.2616007966):0.6595019614,(((t13:0.2706014984,t10:0.0950807028):0.3844690423,((t4:0.4765229183,t6:0.1098402012):0.9078059539,((t8:0.5782247176,t17:0.3210065537):0.2936283879,t3:0.1973517456):0.1450195813):0.007349848282):0.6517515222,((t7:0.1301021155,t11:0.1222830669):0.07541335584,(t1:0.98157748,t2:0.05400245683):0.7176890965):0.3630311065):0.2223174456):0.8117952493,((t12:0.2945194815,t19:0.444623478):0.7230126909,((t14:0.9236292241,t16:0.005563544575):0.5505843789,(t18:0.8419787451,t9:0.7891180061):0.4485002037):0.8197243938):0.4382306426);"
+
 # =============================================================================
 # Declares
 # =============================================================================
@@ -49,17 +52,22 @@ control_file.append("  [indelrate]    0.1          //  insertion rate = deletion
 control_file.append("                              //  relative to average substitution rate of 1.   ")
 control_file.append("")
 #control_file.append("[TREE] treename ((((A:0.2, B:0.3):0.3,(C:0.5, D:0.3):0.2):0.3, E:0.7):1.0);")
-control_file.append("[TREE] treename ((((t22:0.7884912707,((t14:0.8485323223,t20:0.875784308):0.05844755005,((t29:0.9256454913,t8:0.5681589271):0.6796265363,t30:0.2025386344):0.9573877391):0.08610738721):0.921048284,(((t3:0.9725932428,t17:0.4366256092):0.6381316015,((t16:0.3180074089,t27:0.3864220553):0.2001682797,t21:0.5908179402):0.4302841208):0.4914731416,(t11:0.2886261365,t2:0.8246886986):0.2573057537):0.569526993):0.6803977506,(t10:0.06485857069,(t6:0.001371138263,(((t7:0.3931164765,t12:0.07855357323):0.406146232,(t26:0.9711873827,t23:0.8914815376):0.08172181295):0.4853650811,(t9:0.3540119417,t24:0.01268518576):0.5522214433):0.6867216111):0.939245726):0.7275894266):0.8185117426,((t4:0.5687292085,((t15:0.9149642589,t25:0.1793684226):0.3222816291,t5:0.571961625):0.3456264588):0.1211217023,(t1:0.1853761284,((t13:0.4666023802,(t28:0.6691324431,t18:0.7461213013):0.3977537802):0.7462856739,t19:0.4380299225):0.7384211062):0.4651579566):0.9417840841);")
+control_file.append("[TREE] treename " + newick_tree)
+
 control_file.append("")
 control_file.append("        ")
 control_file.append("//  User trees are defined here")
 control_file.append("")
 control_file.append("")
 control_file.append("[PARTITIONS] partitionname             //  [PARTITIONS] blocks say which models go with")
-control_file.append("  [treename modelname 900]            //  which trees and define the length of the")
+
+# SEQUENCE LENGTH
+
+control_file.append("  [treename modelname 500]            //  which trees and define the length of the")
 control_file.append("                                       //  sequence generated at the root (1000 here).")
 control_file.append("")
-control_file.append("[EVOLVE] partitionname 1 CODON_INDEL_SIMS_1  //  This will generate 100 replicate datasets ")
+control_file.append("[EVOLVE] partitionname 1 CODON_INDEL_SIMS_t1_  //  This will generate 100 replicate datasets ")
+
 #control_file.append("partitionname 5 outputname2")
 #control_file.append("partitionname 5 outputname3")
 control_file.append("        ")
@@ -70,9 +78,14 @@ control_file.append("// To learn how to implement more complicated simulations (
 control_file.append("// models) please consult the manual or the other example control files.")
 
 
-INDEL_RATE = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+INDEL_RATE = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1]
+INDEL_RATE += [0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2]
+INDEL_RATE += [0.21, 0.22, 0.23, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.3]
+INDEL_RATE += [0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38, 0.39, 0.4]
+INDEL_RATE += [0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5]
 
 OUTPUT_FILENAME_TAG = "CODON_INDEL_SIMS_"
+
 num_output_files = 30 #number of files to simulate
 
 # =============================================================================
@@ -104,7 +117,7 @@ def main(RATE):
                 #and then continue
                 f.write(line + "\n")
                 for n in range(2, num_output_files + 1):
-                    f.write("partitionname 1 CODON_INDEL_SIMS_" + str(n) + "\n")
+                    f.write("partitionname 1 CODON_INDEL_SIMS_t1_" + str(n) + "\n")
                 continue
             
             f.write(line + "\n")
@@ -132,10 +145,26 @@ def main(RATE):
 # =============================================================================
 # Main
 # =============================================================================
-    
+#print(os.path.realpath(__file__)) # PATH TO FILE
+#print(os.path.dirname(os.path.realpath(__file__)))
+
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 for rate in INDEL_RATE:
-    main(rate)
-    #break
+    CHECK = CURRENT_DIR + "/" + str(rate).replace(".", "_")
+    #print(CHECK)
+    #print(os.path.exists(CHECK))
+    if not os.path.exists(CHECK):
+        main(rate)
+        #print(os.path.exists(CHECK)) 
+
+
+
+#for rate in INDEL_RATE:
+#    if not os.path.exists(OUTPUT_DIR):
+#    os.makedirs(OUTPUT_DIR)
+#    main(rate)
+#break
 
 # =============================================================================
 #  End of file
