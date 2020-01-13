@@ -1,0 +1,112 @@
+---
+title: "BUSTED_MH"
+author: "sadie"
+date: "1/10/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r, message=FALSE, warning=FALSE,}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(plotly)
+library(tidyr)
+
+```
+
+load data
+```{r load libraries and data, message=FALSE, warning=FALSE, cache=TRUE}
+
+BUSTED_MH <- read_csv("~/Downloads/selectome_subset_THvDH_1_10_2020")
+
+BUSTED.SRV.dat.selectome <- read_csv("~/Downloads/BUSTED-SRV_selectome_5_20_19")
+
+BUSTED.dat.selectome <- read_csv("~/Downloads/BUSTED_selectome_5_20_19")
+```
+
+get basenames for files since full paths aren't going to match
+```{r}
+BUSTED_MH$basename <- BUSTED_MH$FILE %>% basename()
+
+BUSTED.SRV.dat.selectome$basename <-BUSTED.SRV.dat.selectome$FILE %>% basename()
+
+BUSTED.dat.selectome$basename <-BUSTED.dat.selectome$FILE %>% basename()
+```
+
+create one df with both BUSTED[SMH] and BUSTED[S] results matching the results by basename, number of sites and number of sequences. 
+```{r}
+dat <- inner_join(BUSTED_MH,BUSTED.SRV.dat.selectome, by = c("basename", "Sites", "Sequences"), suffix = c(".MH",".SYN"))
+
+dat.sel <- inner_join(BUSTED.dat.selectome,BUSTED.SRV.dat.selectome, by = c("basename", "Sites", "Sequences") )%>% filter(basename %in% BUSTED_MH$basename)
+
+attach(dat)
+```
+
+```{r}
+dat %>% ggplot() + geom_point(aes(x=BUSTED.SRV.P.MH, y = BUSTED.SRV.P.SYN)) + geom_abline(slope = 1, intercept = 0)
+```
+BUSTED[S] p values are typically lower than BUSTED[SMH] p values
+
+```{r}
+dat %>% ggplot() + geom_histogram(aes(x = BUSTED.SRV.P.MH), fill = "red", alpha = 0.5, binwidth = 0.01) + 
+  geom_histogram(aes(x = BUSTED.SRV.P.SYN), fill = 'blue' , alpha = 0.5, binwidth = 0.01)
+```
+
+```{r}
+pairs(data = dat, ~ CV.SRV.MH + CV.SRV.SYN + srv.omega.3.rate.MH + srv.omega.3.rate.SYN)
+```
+
+
+oh how do the two way tables compare???
+
+```{r}
+source("/Volumes/GoogleDrive/My Drive/BUSTED-SRV/R/useful_functions.R")
+
+gen.sig.table.mh <- function(dat = x, p = 0.05, Bon = FALSE){
+  #prints out a table that tells what proportion of data files
+  #are under selection/not under selection according to BUSTED
+  #and BUSTED+SRV
+  require("xtable")
+  library("xtable")
+  
+  #bonferroni correction
+  if(Bon ==TRUE){
+  alpha <- p/nrow(dat)
+  }
+  if(Bon == FALSE){
+    alpha <- p
+  }
+  
+  under.sel.busted = which(dat$BUSTED.SRV.P.MH<=alpha)
+  under.sel.srv = which(dat$BUSTED.SRV.P.SYN<=alpha)
+  
+  
+  mat = matrix( rep(0),nrow=length(dat$BUSTED.SRV.P.MH),ncol = 2,
+                dimnames= list(1:length(dat$BUSTED.SRV.P.MH),
+                               c("BUSTED[MH]", "BUSTED[S]")))
+  mat[under.sel.busted,1] = 1
+  mat[under.sel.srv,2] = 1 
+  sel.tab = table(mat[,1],mat[,2], dnn = colnames(mat))
+  t.names <- c("No Selection", "Selection")
+  row.names(sel.tab) <- t.names[rownames(sel.tab) %>% as.numeric()+1]
+  colnames(sel.tab) <- t.names[colnames(sel.tab) %>% as.numeric()+1]
+  Sel.Prop =prop.table(sel.tab)
+  test.table = xtable(Sel.Prop)
+ 
+ 
+  print.xtable(test.table, type = "latex", file = "sel_table.txt")
+  return(Sel.Prop)
+}
+
+dat %>% gen.sig.table.mh()
+```
+
+so about 19% of the data sets are under selection according to BUSTED[S] but not BUSTED[SMH].
+
+```{r}
+dat.sel %>% gen.sig.table()
+```
+
+about 15% of the data sets are under selection according to BUSTED but not BUSTED[S]. Overall, more data sets have no evidence of positive selection according to both tests for BUSTED[S] and BUSTED[SMH] verse BUSTED and BUSTED[S]
