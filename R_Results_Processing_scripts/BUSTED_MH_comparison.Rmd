@@ -37,13 +37,16 @@ BUSTED.dat.selectome$basename <-BUSTED.dat.selectome$FILE %>% basename()
 
 create one df with both BUSTED[SMH] and BUSTED[S] results matching the results by basename, number of sites and number of sequences. 
 ```{r}
-dat <- inner_join(BUSTED_MH,BUSTED.SRV.dat.selectome, by = c("basename", "Sites", "Sequences"), suffix = c(".MH",".SYN"))
+dat <- inner_join(BUSTED_MH,BUSTED.SRV.dat.selectome,  by = c("basename", "Sites", "Sequences"), suffix = c(".MH",".SYN"))
 
 dat.sel <- inner_join(BUSTED.dat.selectome,BUSTED.SRV.dat.selectome, by = c("basename", "Sites", "Sequences") )%>% filter(basename %in% BUSTED_MH$basename)
+
+dat_3 <- inner_join(dat, BUSTED.dat.selectome, by = c("basename", "Sites", "Sequences"))
 
 attach(dat)
 ```
 
+line is x = y 
 ```{r}
 dat %>% ggplot() + geom_point(aes(x=BUSTED.SRV.P.MH, y = BUSTED.SRV.P.SYN)) + geom_abline(slope = 1, intercept = 0)
 ```
@@ -110,3 +113,21 @@ dat.sel %>% gen.sig.table()
 ```
 
 about 15% of the data sets are under selection according to BUSTED but not BUSTED[S]. Overall, more data sets have no evidence of positive selection according to both tests for BUSTED[S] and BUSTED[SMH] verse BUSTED and BUSTED[S]
+
+
+three-way comparison of p values
+```{r}
+library(reshape2)
+
+dat_3 %>% melt(measure.vars = c("BUSTED.P", "BUSTED.SRV.P.MH", "BUSTED.SRV.P.SYN"), id.vars = c("basename", "Sites", "Sequences")) -> temp
+
+temp %>% ggplot()+ geom_boxplot( aes(y = value, x = variable))
+```
+
+
+or violin plot
+```{r}
+temp %>% ggplot()+ geom_violin( aes(y = value, x = variable))
+```
+
+basically shows that for BUSTED[SMH] p values are skewed much higher in comparison to both BUSTED and BUSTED[S]

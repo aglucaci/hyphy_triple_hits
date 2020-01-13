@@ -137,7 +137,7 @@ ggplot()+geom_point(aes(x.DHvSH, y.DHvSH, color = 'DHvSH', size = z.DHvSH))+
     geom_point(aes(x.THvDH, y.THvDH, color = 'THvDH', , size = z.THvDH))+ 
     geom_smooth(aes(x.THvDH, y.THvDH, color = 'THvDH', weight = z.THvDH), method = loess, se = FALSE) + 
     xlab(l) +
-    ylab("Fraction under selection")+ 
+    ylab("Fraction significant")+ 
     labs(color = "")
   
   
@@ -165,6 +165,7 @@ g3 <- dep_bin ('Tree Length - MG94 with double and triple instantaneous substitu
 prow <- plot_grid( g1, g2, g3, ncol = 3)
 #add a bottom legend to the plots
 plot_grid(prow, leg, ncol = 1, rel_heights = c(1, .1))
+ggsave("./Frac_under_sel_codons_seq_TL.png", height = 4, width = 11)
 ```
 ```{r}
 #generate some more plots

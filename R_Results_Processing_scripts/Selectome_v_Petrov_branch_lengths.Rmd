@@ -2,7 +2,9 @@
 title: "Selectome_v_Petrov_branch_lengths"
 author: "sadie"
 date: "9/20/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 
@@ -22,6 +24,8 @@ library(tidyr)
 selectome.dat <- read_csv("~/Downloads/SELECTOME_SRV_nr_v02.csv")
 
 petrov.dat <- read_csv("~/Downloads/PETROV_SRV_nr_v02.csv")
+
+schultz.dat <- read_csv("~/Downloads/IMMUNE_SRV_nr_v02.csv")
 
 ```
 
@@ -84,11 +88,38 @@ temp.2$Lengthx3 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\
 pet.dat.bl <- temp.2
 ```
 
+## put branch length estimates for each model in own column for each branch for IMMUNE/Schultz
+## Lengthx1 - the branch length according to Standard MG94
+## Lengthx2 - the branch length according to the double hit MG94
+## Lengthx3 - the branch length according to the triple hit MG94
+```{r, cache=TRUE}
+attach(schultz.dat)
+temp.2 <- schultz.dat %>% separate_rows(., `Branch Attributes - MG94 with double and triple instantaneous substitutions`,`Branch Attributes - MG94 with double instantaneous substitutions`, `Branch Attributes - Standard MG94`, sep = ",")
+
+temp.2 <- temp.2 %>% separate(`Branch Attributes - MG94 with double and triple instantaneous substitutions`, c("Branchx3", "Lengthx3"), sep = ":", convert = TRUE)
+
+temp.2 <- temp.2 %>% separate(`Branch Attributes - MG94 with double instantaneous substitutions`, c("Branchx2", "Lengthx2"), sep = ":", convert = TRUE)
+
+temp.2 <- temp.2 %>% separate(`Branch Attributes - Standard MG94`, c("Branchx1", "Lengthx1"), sep = ":", convert = TRUE)
+
+
+temp.2$Branch <- temp.2$Branchx3 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\}") %>% str_trim()
+
+
+temp.2$Lengthx1 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\}") %>% str_trim() -> temp.2$Lengthx1
+
+temp.2$Lengthx2 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\}") %>% str_trim() -> temp.2$Lengthx2
+
+temp.2$Lengthx3 %>% str_remove_all("'") %>% str_remove("\\{") %>% str_remove("\\}") %>% str_trim() -> temp.2$Lengthx3
+
+schultz.dat.bl <- temp.2
+```
+
 ```{r}
 pet.dat.bl %>% ggplot()+ geom_histogram(aes(as.numeric(Lengthx1)), binwidth = 0.01, fill = "red", alpha = 0.5)+ coord_cartesian(xlim = c(0,0.5))
 sel.dat.bl %>% filter(as.numeric(Lengthx1 )!= 0) %>% ggplot()+ geom_histogram(aes(as.numeric(Lengthx1)), binwidth = 0.01, fill = "blue", alpha = 0.5)+ xlim(0,0.5)
 
-ggplot()+ geom_histogram(data = sel.dat.bl, aes(x =as.numeric(Lengthx1),  y = (..count..)/sum(..count..)), binwidth = 0.01, fill = "blue", alpha = 0.5)+ xlim(0,0.5)+ geom_histogram(data = pet.dat.bl, aes(x =as.numeric(Lengthx1),  y = (..count..)/sum(..count..)), binwidth = 0.01, fill = "red", alpha = 0.5) + labs(x = "branch lengths (MG94)")
+ggplot()+ geom_histogram(data = sel.dat.bl, aes(x =as.numeric(Lengthx1),  y = (..count..)/sum(..count..)), binwidth = 0.01, fill = "blue", alpha = 0.5)+ xlim(0,0.5)+ geom_histogram(data = pet.dat.bl, aes(x =as.numeric(Lengthx1),  y = (..count..)/sum(..count..)), binwidth = 0.01, fill = "red", alpha = 0.5) + labs(x = "branch lengths (MG94)")+ geom_histogram(data = schultz.dat.bl, aes(x =as.numeric(Lengthx1),  y = (..count..)/sum(..count..)), binwidth = 0.01, fill = "yellow", alpha = 0.5) + labs(x = "branch lengths (MG94)")
 
 ```
 
@@ -96,11 +127,15 @@ ggplot()+ geom_histogram(data = sel.dat.bl, aes(x =as.numeric(Lengthx1),  y = (.
 summary(sel.dat.bl$Lengthx1 %>% as.numeric())
 
 summary(pet.dat.bl$Lengthx1 %>% as.numeric())
+
+summary(schultz.dat.bl$Lengthx1 %>% as.numeric())
 ```
+
 ```{r}
 comb.length <- bind_rows(
   sel.dat.bl %>% select(Lengthx1) %>% mutate(dataset = "Selectome"),
-  pet.dat.bl %>% select(Lengthx1) %>% mutate(dataset = "Petrov")
+  pet.dat.bl %>% select(Lengthx1) %>% mutate(dataset = "Petrov"),
+  schultz.dat.bl %>% select(Lengthx1) %>% mutate(dataset = "Schultz")
   )
 ```
 
@@ -112,5 +147,35 @@ comb.length %>% ggplot()+geom_boxplot(aes(y = as.numeric(Lengthx1), x = dataset)
 comb.length %>% filter(Lengthx1 %>% as.numeric() <=2) %>% ggplot()+geom_violin(aes(y = as.numeric(Lengthx1), x = dataset), scale = "count")  + labs(y = "branch length (mg94)")
 ```
 
+#explore other variables
+##sequence length comparasion 
 
+### histogram of number of sites
+```{r}
+ggplot()+ geom_histogram(data = selectome.dat, aes(x = `number of sites`,  y = (..count..)/sum(..count..)), binwidth = 10, fill = "blue", alpha = 0.5)+ geom_histogram(data = petrov.dat, aes(x =`number of sites`,  y = (..count..)/sum(..count..)), binwidth = 10, fill = "red", alpha = 0.5) + labs(x = "number of sites")+ geom_histogram(data = schultz.dat, aes(x =`number of sites`,  y = (..count..)/sum(..count..)), binwidth = 10, fill = "yellow", alpha = 0.5) 
+```
+
+not clear if there is any difference here. maybe selectome is a little shorter
+let's look at numbers
+
+```{r}
+summary(selectome.dat$`number of sites`)
+
+summary(petrov.dat$`number of sites`)
+
+summary(schultz.dat$`number of sites`)
+```
+
+```{r}
+comb.length <- bind_rows(
+  selectome.dat %>% select(`number of sites`) %>% mutate(dataset = "Selectome"),
+  petrov.dat %>% select(`number of sites`) %>% mutate(dataset = "Petrov"),
+  schultz.dat %>% select(`number of sites`) %>% mutate(dataset = "Schultz")
+  )
+```
+
+
+```{r}
+comb.length  %>% ggplot()+geom_violin(aes(y = `number of sites`, x = dataset), scale = "count")  + labs(y = "number of sites")
+```
 
