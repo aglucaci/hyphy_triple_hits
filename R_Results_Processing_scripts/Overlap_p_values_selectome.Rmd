@@ -1,0 +1,85 @@
+---
+title: "Overlap of p values"
+author: "sadie"
+date: "12/16/2019"
+output: html_document
+---
+
+i want to know if the alignments that are significant according to TH are the same in all the LRTs
+
+```{r setup}
+#set up libraries
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(reshape2)
+library(cowplot)
+```
+
+```{r load libraries and data, message=FALSE, warning=FALSE, cache=TRUE}
+#read in selectome data
+
+selectome.dat <- read_csv("~/Downloads/selectome_results_FMM.csv")
+```
+
+lets try a visualization using the nVennR package
+```{r}
+library(nVennR)
+
+#set up lists
+
+DHvSH <- selectome.dat$`File name`[which( selectome.dat$`Double-hit vs single-hit - p-value` <= 0.05)]
+
+THvSH <- selectome.dat$`File name`[which( selectome.dat$`Triple-hit vs single-hit - p-value` <= 0.05)]
+
+THvDH <- selectome.dat$`File name`[which( selectome.dat$`Triple-hit vs double-hit - p-value` <= 0.05)]
+
+THvTHI <- selectome.dat$`File name`[which( selectome.dat$`Triple-hit vs Triple-hit-island - p-value` <= 0.05)]
+
+THIvDH <- selectome.dat$`File name`[which( selectome.dat$`Triple-hit-island vs double-hit - p-value` <= 0.05)]
+
+```
+
+```{r}
+myV <- plotVenn(list(DHvSH = DHvSH,THIvDH= THIvDH,THvDH=THvDH,THvSH=THvSH,THvTHI= THvTHI),, opacity = 0.1, borderWidth = 3, outFile ="./temp.svg")
+```
+
+```{r}
+myV <- plotVenn(list(THvDH=THvDH,THvSH=THvSH,THvTHI= THvTHI),nCycles = 2000, outFile ="./temp_1.svg", opacity = 0.1, borderWidth = 6)
+```
+
+```{r}
+myV1 <- plotVenn(list(THvDH=THvDH,THIvDH= THIvDH,THvTHI= THvTHI), outFile ="./temp_2.svg",opacity = 0.1, borderWidth = 5)
+
+#showSVG(nVennObj = myV1, opacity = 0.1, borderWidth = 3, outFile ="./temp_2.svg")
+```
+
+```{r}
+library(UpSetR)
+listInput <- list(DHvSH = DHvSH,THIvDH= THIvDH,THvDH=THvDH,THvSH=THvSH,THvTHI= THvTHI)
+```
+
+```{r}
+upset(fromList(listInput), order.by = "freq")
+```
+
+
+```{r}
+listInput <- list(THIvDH= THIvDH, THvDH= THvDH)
+
+upset(fromList(listInput), order.by = "freq")
+```
+
+```{r}
+listInput <- list(THIvDH= THIvDH, THvDH= THvDH, THvTHI = THvTHI)
+
+upset(fromList(listInput), order.by = "freq")
+```
+
+```{r}
+listInput <- list(DHvSH = DHvSH,THvDH=THvDH,THvSH=THvSH)
+
+upset(fromList(listInput), order.by = "freq")
+```

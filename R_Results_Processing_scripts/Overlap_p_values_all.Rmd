@@ -1,0 +1,121 @@
+---
+title: "Overlap p values all"
+author: "sadie"
+date: "2/13/2020"
+output: html_document
+---
+
+```{r setup}
+#set up libraries
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(reshape2)
+library(cowplot)
+```
+
+```{r load libraries and data, message=FALSE, warning=FALSE, cache=TRUE}
+#read in selectome data
+
+selectome.dat <- read_csv("~/Downloads/SELECTOME_SRV_nr_v02.csv")
+
+petrov.dat <- read_csv("~/Downloads/PETROV_SRV_nr_v02.csv")
+
+schultz.dat <- read_csv("~/Downloads/IMMUNE_SRV_nr_v02.csv")
+
+invert.dat <- read_csv("~/Downloads/INVERT_SRV_nr_v02.csv")
+
+vert.dat <- read_csv("~/Downloads/VERT_SRV_nr_v02.csv")
+
+selectome.dat <- mutate(selectome.dat, dataset = "selectome")
+petrov.dat <- mutate(petrov.dat, dataset = "petrov")
+schultz.dat <- mutate(schultz.dat, dataset = "schultz")
+invert.dat <- mutate(invert.dat, dataset = "invert_mt")
+vert.dat <- mutate(vert.dat, dataset = "vert_mt")
+
+all.dat <- rbind_all(list(selectome.dat, schultz.dat, petrov.dat, invert.dat, vert.dat))
+
+#all.dat <- all.dat %>% group_by(dataset)
+
+#all.dat$`rate at which 3 nucleotides are changed instantly within a single codon_1` %>% summary(na.rm = T)
+```
+
+lets try a visualization using the nVennR package
+```{r}
+ #all.dat <- all.dat %>% filter(dataset == "selectome")
+ 
+#all.dat <- all.dat %>% filter(dataset == "petrov")
+
+#all.dat <- all.dat %>% filter(dataset == "schultz")
+
+#all.dat <- all.dat %>% filter(dataset == "invert_mt")
+#all.dat <- all.dat %>% filter(dataset == "vert_mt")
+
+
+#set up lists
+
+DHvSH <- all.dat[which( all.dat$`Double-hit vs single-hit - p-value` <= 0.01),] %>% select(`File name`)
+
+THvSH <- all.dat[which( all.dat$`Triple-hit vs single-hit - p-value` <= 0.01),] %>% select(`File name`)
+
+THvDH <- all.dat[which( all.dat$`Triple-hit vs double-hit - p-value` <= 0.01),] %>% select(`File name`)
+
+THvTHSI <- all.dat[which( all.dat$`Triple-hit vs Triple-hit-island - p-value` <= 0.01),] %>% select(`File name`)
+
+THSIvDH <- all.dat[which( all.dat$`Triple-hit-island vs double-hit - p-value` <= 0.01),] %>% select(`File name`)
+
+```
+
+
+
+
+
+```{r}
+library(UpSetR)
+#listInput <- list(DHvSH = DHvSH,`3HIv2H`= `3HIv2H`,THvDH=THvDH,THvSH=THvSH,`3Hv3HI`= `3Hv3HI`)
+listInput <- list(DHvSH = DHvSH,THvTHSI= THvTHSI,THvDH=THvDH,THSIvDH = THSIvDH)
+```
+
+```{r}
+upset(fromList(listInput), order.by = "freq")
+
+#upset()
+```
+
+```{r}
+3H.only <- setdiff(THvDH, c(DHvSH))
+```
+
+```{r}
+selectome.dat[which(selectome.dat$`File name`%in%3H.only),]
+petrov.dat[which(petrov.dat$`File name`%in%3H.only),]
+```
+
+
+
+```{r}
+listInput <- list(THvTHSI= THvTHSI, THvDH= THvDH)
+
+upset(fromList(listInput), order.by = "freq")
+```
+
+```{r}
+listInput <- list(`3HIv2H`= `3HIv2H`, THvDH= THvDH, `3Hv3HI` = `3Hv3HI`)
+
+upset(fromList(listInput), order.by = "freq")
+```
+
+```{r}
+listInput <- list(DHvSH = DHvSH,THvDH=THvDH,THvSH=THvSH)
+
+upset(fromList(listInput), order.by = "freq")
+```
+
+
+```{r}
+listInput <- list(DHvSH = DHvSH,THvDH=THvDH)
+
+upset(fromList(listInput), order.by = "freq")
+```
