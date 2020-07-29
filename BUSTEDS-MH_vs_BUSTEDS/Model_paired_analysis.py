@@ -36,13 +36,13 @@ def read_json(filename):
     fh.close()
     
     p_value = json_data["test results"]["p-value"]
-    UN_cAIC = json_data["fits"]["Unconstrained model"]["AIC-c"]
-    UN_log_L = json_data["fits"]["Unconstrained model"]["Log Likelihood"]
+    BASE_Unconstrained_cAIC = json_data["fits"]["Unconstrained model"]["AIC-c"]
+    BASE_Unconstrained_log_L = json_data["fits"]["Unconstrained model"]["Log Likelihood"]
     
     print("\t\tBaseline model (BUSTEDS) p-value =", p_value)
-    print("\t\tBaseline model (BUSTEDS) Unconstrained cAIC =", UN_cAIC)
-    print("\t\tBaseline model (BUSTEDS) Unconstrained logL =", UN_log_L)
-    return p_value, UN_cAIC, UN_log_L
+    print("\t\tBaseline model (BUSTEDS) Unconstrained cAIC =", BASE_Unconstrained_cAIC)
+    print("\t\tBaseline model (BUSTEDS) Unconstrained logL =", BASE_Unconstrained_log_L)
+    return p_value, BASE_Unconstrained_cAIC, BASE_Unconstrained_log_L
 #end method
 
 def read_json_MH(filename_MH):
@@ -65,27 +65,31 @@ def read_json_MH(filename_MH):
     MH_TH_SI_rate = json_data["fits"]["MG94 with double and triple instantaneous substitutions"]["Rate Distributions"]["rate at which 3 nucleotides are changed instantly within a single codon between synonymous codon islands"]
     
     # Part 2 - "Unconstrained model"
-    #UN_cAIC = json_data["fits"]["Unconstrained model"]["AIC-c"]
-    #UN_log_L = json_data["fits"]["Unconstrained model"]["Log Likelihood"]
+    MH_Unconstrained_cAIC = json_data["fits"]["Unconstrained model"]["AIC-c"]
+    MH_Unconstrained_log_L = json_data["fits"]["Unconstrained model"]["Log Likelihood"]
     #UN_SRV_0 = json_data["fits"]["Unconstrained model"]["Rate Distributions"]["Synonymous site-to-site rates"]
     #UN_SRV_1 = json_data["fits"]["Unconstrained model"]["Rate Distributions"]["Synonymous site-to-site rates"]
     #UN_SRV_2 = json_data["fits"]["Unconstrained model"]["Rate Distributions"]["Synonymous site-to-site rates"]
-    UN_DH_rate = json_data["fits"]["Unconstrained model"]["rate at which 2 nucleotides are changed instantly within a single codon"]
-    UN_TH_rate = json_data["fits"]["Unconstrained model"]["rate at which 3 nucleotides are changed instantly within a single codon"]
-    UN_TH_SI_rate = json_data["fits"]["Unconstrained model"]["rate at which 3 nucleotides are changed instantly within a single codon between synonymous codon islands"]
+    MH_Unconstrained_DH_rate = json_data["fits"]["Unconstrained model"]["rate at which 2 nucleotides are changed instantly within a single codon"]
+    MH_Unconstrained_TH_rate = json_data["fits"]["Unconstrained model"]["rate at which 3 nucleotides are changed instantly within a single codon"]
+    MH_Unconstrained_TH_SI_rate = json_data["fits"]["Unconstrained model"]["rate at which 3 nucleotides are changed instantly within a single codon between synonymous codon islands"]
     
     #Report on what we found.
     print("\t\tNovel model (BUSTEDS-MH) p-value =", p_value)
-    print("\t\tNovel model (BUSTEDS-MH) cAIC =", MH_cAIC)
-    print("\t\tNovel model (BUSTEDS-MH) logL =", MH_log_L)
+    print("\t\tNovel model (BUSTEDS-MH) cAIC =", MH_Unconstrained_cAIC)
+    print("\t\tNovel model (BUSTEDS-MH) logL =", MH_Unconstrained_log_L)
     
-    return p_value, MH_cAIC, MH_log_L, MH_dNdS, MH_DH_rate, MH_TH_rate, MH_TH_SI_rate, UN_DH_rate, UN_TH_rate, UN_TH_SI_rate
+    return p_value, MH_cAIC, MH_log_L, MH_dNdS, MH_DH_rate, MH_TH_rate, MH_TH_SI_rate, MH_Unconstrained_cAIC, MH_Unconstrained_log_L, MH_Unconstrained_DH_rate, \
+                MH_Unconstrained_TH_rate, \
+                MH_Unconstrained_TH_SI_rate
 #end method
 
 def process(filename_MH, filename):
     global OUTPUT_CSV
-    p_value_BUSTEDS, UN_cAIC, UN_log_L = read_json(filename)
-    p_value_BUSTEDS_MH, MH_cAIC, MH_log_L, MH_dNdS, MH_DH_rate, MH_TH_rate, MH_TH_SI_rate, UN_DH_rate, UN_TH_rate, UN_TH_SI_rate  = read_json_MH(filename_MH)
+    p_value_BUSTEDS, BASE_Unconstrained_cAIC, BASE_Unconstrained_log_L = read_json(filename)
+    p_value_BUSTEDS_MH, MH_MG94_cAIC, MH_MG94_log_L, MH_MG94_dNdS, MH_MG94_DH_rate, MH_MG94_TH_rate, MH_MG94_TH_SI_rate, MH_Unconstrained_cAIC, MH_Unconstrained_log_L, MH_Unconstrained_DH_rate, \
+                MH_Unconstrained_TH_rate, \
+                MH_Unconstrained_TH_SI_rate  = read_json_MH(filename_MH)
 
     #Calculate aBSREL-MH minus aBSREL
     #delta_cAIC = float(cAIC_aBSREL_MH) - float(cAIC_aBSREL)
@@ -101,7 +105,13 @@ def process(filename_MH, filename):
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         
         spamwriter.writerow([filename_MH.split("/")[-1].replace(".BUSTEDS.json", ""), str(p_value_BUSTEDS_MH), str(p_value_BUSTEDS), str(delta_p_value),
-                             MH_cAIC, MH_log_L, MH_dNdS, MH_DH_rate, MH_TH_rate, MH_TH_SI_rate, UN_cAIC, UN_log_L, UN_DH_rate, UN_TH_rate, UN_TH_SI_rate
+                             BASE_Unconstrained_cAIC, BASE_Unconstrained_log_L, \
+                             MH_MG94_cAIC, MH_MG94_log_L, \
+                                 MH_MG94_dNdS, MH_MG94_DH_rate, MH_MG94_TH_rate, MH_MG94_TH_SI_rate, \
+                                 MH_Unconstrained_cAIC, MH_Unconstrained_log_L, \
+                                     MH_Unconstrained_DH_rate, \
+                                     MH_Unconstrained_TH_rate, \
+                                     MH_Unconstrained_TH_SI_rate
                              ])
     csvfile.close()
     #end with
@@ -124,7 +134,11 @@ print("# Saving output to:", OUTPUT_CSV)
 with open(OUTPUT_CSV, 'w', newline='') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    spamwriter.writerow(["Filename", "pvalue_BUSTEDSMH", "pvalue_BUSTEDS", "delta", "MH_cAIC", "MH_log_L", "MH_dNdS", "MH_DH_rate", "MH_TH_rate", "MH_TH_SI_rate", "UN_cAIC", "UN_log_L", "UN_DH_rate", "UN_TH_rate", "UN_TH_SI_rate"])
+    spamwriter.writerow(["Filename", "pvalue_BUSTEDSMH", "pvalue_BUSTEDS", "delta p-values", \
+                         "BASE_Unconstrained_cAIC", "BASE_Unconstrained_log_L",
+                         "MH_MG94x(2+3)_cAIC", "MH_MG94x(2+3)_log_L", "MH_MG94x(2+3)_dNdS", "MH_MG94x(2+3)_DH_rate", "MH_MG94x(2+3)_TH_rate", "MH_MG94x(2+3)_TH_SI_rate", \
+                         "MH_Unconstrained_cAIC", "MH_Unconstrained_log_L", \
+                         "MH_Unconstrained_DH_rate", "MH_Unconstrained_TH_rate", "MH_Unconstrained_TH_SI_rate"])
 csvfile.close()
 #end with
     
