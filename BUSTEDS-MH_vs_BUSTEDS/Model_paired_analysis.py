@@ -17,11 +17,16 @@ import csv
 # =============================================================================
 # Declares
 # =============================================================================
+# Empirical
+#DIR = "/Users/user/Documents/EmpiricalDatasets/11-datasets"
+#MH_DIR = "/Users/user/Documents/EmpiricalDatasets/11-datasets"
+#OUTPUT_CSV = "processed_paired_analysis_BUSTEDS-MH_vs_BUSTEDS.csv"
 
-DIR = "/Users/user/Documents/EmpiricalDatasets/11-datasets"
-MH_DIR = "/Users/user/Documents/EmpiricalDatasets/11-datasets"
+# Unmasked Selectome
+DIR = "/Users/user/Documents/TH_REVISIONS/analysis/BUSTEDS-Selectome/selectome_4_11_19/BUSTED_12_runs"
+MH_DIR = "/Users/user/Documents/TH_REVISIONS/analysis/BUSTED_on_UNMASKED_SELECTOME_07272020"
+OUTPUT_CSV = "processed_paired_analysis_Unmasked_Selectome_BUSTEDS-MH_vs_BUSTEDS.csv"
 
-OUTPUT_CSV = "processed_paired_analysis_BUSTEDS-MH_vs_BUSTEDS.csv"
 
 # =============================================================================
 # Helper functions
@@ -122,8 +127,8 @@ def process(filename_MH, filename):
 # Main subroutine
 # =============================================================================
 
-SMH_tag = ".BUSTEDS-MH.json"
-S_tag = ".BUSTEDS.json"
+#SMH_tag = ".BUSTEDS-MH.json"
+#S_tag = ".BUSTEDS.json"
 
 print("# Init ")
 print("# Program is in:", os.getcwd())
@@ -144,9 +149,14 @@ csvfile.close()
     
 print("# Processing ", DIR)
 print("# Processing ", MH_DIR)
-BUSTEDS_DIR_FILES = [os.path.join(DIR, file.name) for file in os.scandir(DIR) if file.name.endswith(".BUSTEDS.json")]
-BUSTEDS_MH_DIR_FILES = [os.path.join(MH_DIR, file.name) for file in os.scandir(MH_DIR) if file.name.endswith(".BUSTEDS-MH.json")]
+#BUSTEDS_DIR_FILES = [os.path.join(DIR, file.name) for file in os.scandir(DIR) if file.name.endswith(".BUSTEDS.json")]
+#BUSTEDS_MH_DIR_FILES = [os.path.join(MH_DIR, file.name) for file in os.scandir(MH_DIR) if file.name.endswith(".BUSTEDS-MH.json")]
 
+BASE_tag = ""
+MH_tag = ""
+
+BUSTEDS_DIR_FILES = [os.path.join(DIR, file.name) for file in os.scandir(DIR) if file.name.endswith(".BUSTED_SRV.json")]
+BUSTEDS_MH_DIR_FILES = [os.path.join(MH_DIR, file.name) for file in os.scandir(MH_DIR) if file.name.endswith(".BUSTEDS-MH.json")]
 
 print("# Number of BUSTEDS results:", len(BUSTEDS_DIR_FILES))
 print("# Number of BUSTEDS-MH results:", len(BUSTEDS_MH_DIR_FILES))
@@ -157,7 +167,7 @@ for n, file in enumerate(BUSTEDS_MH_DIR_FILES):
     print("# Searching for match for:", file.split("/")[-1])
     NEXUS_FILENAME = file.split("/")[-1].replace(".BUSTEDS-MH.json", "")
     
-    BUSTEDS_VERSION = os.path.join(DIR, NEXUS_FILENAME) + ".BUSTEDS.json"
+    BUSTEDS_VERSION = os.path.join(DIR, NEXUS_FILENAME) + ".BUSTED_SRV.json"
     print("\t", n, "Checking for BUSTEDS output for:", BUSTEDS_VERSION.split("/")[-1])
     # Does it match with a file in aBSREL_DIR?, if soo..
     if BUSTEDS_VERSION in BUSTEDS_DIR_FILES:
