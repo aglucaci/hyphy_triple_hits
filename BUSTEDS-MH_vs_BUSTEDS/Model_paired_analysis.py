@@ -17,15 +17,20 @@ import csv
 # =============================================================================
 # Declares
 # =============================================================================
-# Empirical
+# Empirical 11-datasets
+DIR = "/Users/user/Documents/TH_REVISIONS/analysis/13-datasets"
+MH_DIR = DIR
+OUTPUT_CSV = "PROCESSED_paired_analysis_BUSTEDS-MH_vs_BUSTEDS_13datasets.csv"
+
+# Empirical 11-datasets
 #DIR = "/Users/user/Documents/EmpiricalDatasets/11-datasets"
 #MH_DIR = "/Users/user/Documents/EmpiricalDatasets/11-datasets"
 #OUTPUT_CSV = "processed_paired_analysis_BUSTEDS-MH_vs_BUSTEDS.csv"
 
 # Unmasked Selectome
-DIR = "/Users/user/Documents/TH_REVISIONS/analysis/BUSTEDS-Selectome/selectome_4_11_19/BUSTED_12_runs"
-MH_DIR = "/Users/user/Documents/TH_REVISIONS/analysis/BUSTED_on_UNMASKED_SELECTOME_07272020"
-OUTPUT_CSV = "processed_paired_analysis_Unmasked_Selectome_BUSTEDS-MH_vs_BUSTEDS.csv"
+#DIR = "/Users/user/Documents/TH_REVISIONS/analysis/BUSTEDS-Selectome/selectome_4_11_19/BUSTED_12_runs"
+#MH_DIR = "/Users/user/Documents/TH_REVISIONS/analysis/BUSTED_on_UNMASKED_SELECTOME_07272020"
+#OUTPUT_CSV = "processed_paired_analysis_Unmasked_Selectome_BUSTEDS-MH_vs_BUSTEDS.csv"
 
 
 # =============================================================================
@@ -36,6 +41,7 @@ def read_json(filename):
     print("\t # Reading:", filename)
     
     if os.stat(filename).st_size == 0: return 9999991 
+    
     with open(filename, "r") as fh:
         json_data = json.load(fh)
     fh.close()
@@ -49,6 +55,7 @@ def read_json(filename):
     print("\t\tBaseline model (BUSTEDS) Unconstrained logL =", BASE_Unconstrained_log_L)
     return p_value, BASE_Unconstrained_cAIC, BASE_Unconstrained_log_L
 #end method
+
 
 def read_json_MH(filename_MH):
     print("\t # Reading:", filename_MH)
@@ -155,7 +162,7 @@ print("# Processing ", MH_DIR)
 BASE_tag = ""
 MH_tag = ""
 
-BUSTEDS_DIR_FILES = [os.path.join(DIR, file.name) for file in os.scandir(DIR) if file.name.endswith(".BUSTED_SRV.json")]
+BUSTEDS_DIR_FILES = [os.path.join(DIR, file.name) for file in os.scandir(DIR) if file.name.endswith(".BUSTEDS.json")]
 BUSTEDS_MH_DIR_FILES = [os.path.join(MH_DIR, file.name) for file in os.scandir(MH_DIR) if file.name.endswith(".BUSTEDS-MH.json")]
 
 print("# Number of BUSTEDS results:", len(BUSTEDS_DIR_FILES))
@@ -167,7 +174,7 @@ for n, file in enumerate(BUSTEDS_MH_DIR_FILES):
     print("# Searching for match for:", file.split("/")[-1])
     NEXUS_FILENAME = file.split("/")[-1].replace(".BUSTEDS-MH.json", "")
     
-    BUSTEDS_VERSION = os.path.join(DIR, NEXUS_FILENAME) + ".BUSTED_SRV.json"
+    BUSTEDS_VERSION = os.path.join(DIR, NEXUS_FILENAME) + ".BUSTEDS.json"
     print("\t", n, "Checking for BUSTEDS output for:", BUSTEDS_VERSION.split("/")[-1])
     # Does it match with a file in aBSREL_DIR?, if soo..
     if BUSTEDS_VERSION in BUSTEDS_DIR_FILES:
